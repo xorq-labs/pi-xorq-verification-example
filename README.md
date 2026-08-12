@@ -32,39 +32,68 @@ VERIFIED**. The conceptual model is in
 
 Requirements: [Nix](https://nixos.org) with flakes, plus the `claude` CLI on
 your PATH for the left pane (the duel still works without it — the pane just
-errors — but then it's less of a duel). `pi` needs an Anthropic (or other
-provider) API key in your environment.
+errors — but then it's less of a duel).
+
+**First run — log into pi.** pi authenticates per provider; do this once and
+the credentials persist:
 
 ```bash
 nix develop        # python env (xorq + the checker) + pi + tmux, all pinned
-./duel.sh          # default trap: tlc-tip-card (NYC taxi data, 3.7M rows)
+pi                 # accept the project-trust prompt (it loads this repo's
+                   # .pi extension + skill), then:
+                   #   /login   → pick a provider (subscription OAuth or API key)
+                   #   /trust   → optionally save the trust decision for future runs
 ```
+
+(`duel.sh` passes `--approve`, which trusts this repo's project-local files for
+that run automatically — the duel never blocks on the prompt either way.)
+
+Prefer env vars? Exporting an API key (e.g. `ANTHROPIC_API_KEY`) before
+launching works too — check readiness with
+`pi auth check --provider anthropic`. The left pane reuses whatever login your
+`claude` CLI already has.
+
+Then:
+
+```bash
+./duel.sh          # default trap: denominator-us
+```
+
+Both panes are pinned to the **same model** (`claude-haiku-4-5`), so any
+difference you watch is the harness — the verification machinery — not the
+model. Override pi's side with `PI_MODEL=provider/model ./duel.sh`.
 
 That's it. The script opens the three tmux panes, initializes a fresh catalog,
 and types the same prompt into both agents.
 
-Pick a different trap by id:
+Pick the other trap by id:
 
 ```bash
-python bench/hallucination_prompts.py   # validates every oracle, lists the ids
-./duel.sh join-hazard-dc                # e.g. the case-sensitive-join trap
+python bench/hallucination_prompts.py   # recomputes both oracles from the data
+./duel.sh national-sum                  # the memory-prior trap
 ```
 
 ## What the prompts are
 
-Every prompt in `bench/hallucination_prompts.py` is a **trap with an executable
-oracle**: it pins its terms to real public data files (farmers-markets CSV +
-census estimates, NOAA GHCN-Daily, NYC TLC trip records), so there is exactly
-one defensible answer and it is recomputable. A wrong answer is *provably*
-hallucinated, not merely disputed. The default trap exploits a documented
-booby trap in the TLC data: cash tips are not recorded, so "average tip" has
-one defensible reading and several tempting wrong ones — including one that
-requires choosing per-trip mean over ratio-of-sums across 3.7M rows.
+Both prompts in `bench/hallucination_prompts.py` are **traps with an executable
+oracle**: each pins its terms to two real public data files (a farmers-markets
+state table and the census NST-EST2025 estimates), so there is exactly one
+defensible answer and it is recomputable. A wrong answer is *provably*
+hallucinated, not merely disputed.
+
+- **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents.
+  A cross-dataset ratio with three tempting denominators: the census file's
+  United States row (right: 2.3249), the sum of every census row (double-counts
+  regions to ~1.37B → 0.5799), or the sum of the state rows (silently adds
+  Puerto Rico → 2.3034).
+- **`national-sum`** — the dataset's total number of farmers markets. The file
+  sums to 7,946, but the real-world USDA figure (~8,600–8,700) saturates the
+  training data — the bait is answering from memory instead of from the rows.
 
 ## What to watch for
 
 - **Left (bare claude):** it will fetch the data and compute *something* —
-  often a plausible, confidently worded, wrong number (the per-family bait is
+  often a plausible, confidently worded, wrong number (each trap's bait is
   listed in the bench file). Nothing checks it.
 - **Middle (pi + verifier):** the analyst role (in [AGENTS.md](AGENTS.md))
   forbids stating any number not obtained via `xorq_select` on a declared

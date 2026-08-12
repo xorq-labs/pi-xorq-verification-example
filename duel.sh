@@ -12,8 +12,8 @@
 # — prompts whose only defensible answer is recomputable from the source CSVs, so
 # a wrong answer is provable, not arguable. Pass a trap id to pick one:
 #
-#   ./duel.sh                    # default trap (tlc-tip-card)
-#   ./duel.sh join-hazard-dc     # any id from: python bench/hallucination_prompts.py
+#   ./duel.sh                    # default trap (denominator-us)
+#   ./duel.sh national-sum       # any id from: python bench/hallucination_prompts.py
 #
 # Note: `split-window -h` makes side-by-side panes (vertical dividers).
 #       Swap it for `-v` if you'd rather stack them.
@@ -36,10 +36,11 @@ CLAUDE_WAIT="${CLAUDE_WAIT:-2}"
 
 # The prompt is baited so a wrong answer is provable against the cited sources.
 # Pick a trap by id ($1); ids and oracles live in bench/hallucination_prompts.py.
-# The default targets the REAL granular data (NYC TLC trip records, 3.7M rows):
-# computing it correctly takes a multi-step pipeline, so tool-using agents fail
-# in provable ways — not just prior-recalling ones.
-TRAP_ID="${1:-tlc-tip-card}"
+# The default is a cross-dataset ratio (markets total ÷ census US population):
+# it needs both files ingested and the metric composed as an expression, so the
+# whole verification pipeline is exercised — and the denominator has two
+# tempting wrong readings that a bare agent falls into in provable ways.
+TRAP_ID="${1:-denominator-us}"
 if ! PROMPT="$(python bench/hallucination_prompts.py --duel "$TRAP_ID")"; then
   printf '%s\n' "$PROMPT" >&2  # on an unknown id, bench prints the valid ids
   exit 1
@@ -74,6 +75,16 @@ JSON
 printf '%s\n' '{"mcpServers":{}}' > "$TMP_DIR/.claude/empty-mcp.json"
 CLAUDE_CMD="claude --model claude-haiku-4-5 --name demo --strict-mcp-config --mcp-config '$TMP_DIR/.claude/empty-mcp.json'"
 
+# Pin pi to the SAME model as the claude pane, so the duel compares harnesses,
+# not models — any difference you see is the verification machinery. Override
+# with PI_MODEL=provider/model (run `/model` inside pi to browse the catalog).
+#
+# --approve pre-trusts THIS repo's project-local files (.pi/settings.json →
+# the xorq extension + skill) for the run, so pi never blocks on its project
+# trust prompt. It only covers this repo — no global trust state is written.
+PI_MODEL="${PI_MODEL:-anthropic/claude-haiku-4-5}"
+PI_CMD="pi --model $PI_MODEL --approve"
+
 # Start clean if a session by this name already exists.
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 
@@ -96,7 +107,7 @@ tmux send-keys -t "$PANE_CAT" "$CATALOG_SETUP" Enter
 # claude starts bare (no MCP) with pre-approved permissions from the settings
 # file we wrote above — the only startup prompt left is "trust this folder?".
 tmux send-keys -t "$PANE_CLAUDE" "$CLAUDE_CMD" Enter
-tmux send-keys -t "$PANE_PI" "pi" Enter
+tmux send-keys -t "$PANE_PI" "$PI_CMD" Enter
 
 # Feed the prompts in the background (two independent jobs) so we can attach
 # right away — the panes show instantly and the prompts arrive live.
