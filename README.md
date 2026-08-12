@@ -146,3 +146,7 @@ flake.nix                      pinned env: python (xorq + checker), pi, tmux
 This repo is a self-contained snapshot of
 [pi-xorq-verifier](https://github.com/xorq-labs/pi-xorq-verifier) packaged as a
 runnable demo; see that repo for the maintained checker and extension.
+
+## License
+
+[AGPL-3.0-or-later](LICENSE).

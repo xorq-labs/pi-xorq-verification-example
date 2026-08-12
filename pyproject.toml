@@ -2,6 +2,8 @@
 name = "pi-xorq-verifier"
 version = "0.1.0"
 description = "xorq-native answer verification for the pi coding agent"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
  "attrs>=23.2.0",

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Side-by-side duel demo of xorq-native answer verification for the pi coding agent",
   "keywords": ["pi-package"],
-  "license": "Apache-2.0",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "repository": {
     "type": "git",

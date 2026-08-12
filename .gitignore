@@ -17,6 +17,7 @@ node_modules/
 
 # local demo catalog + build artifacts (duel.sh recreates these)
 .xorq/
+builds/
 
 # nix / direnv
 result
