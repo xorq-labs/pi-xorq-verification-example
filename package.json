@@ -1,0 +1,20 @@
+{
+  "name": "pi-xorq-verification-example",
+  "version": "0.1.0",
+  "description": "Side-by-side duel demo of xorq-native answer verification for the pi coding agent",
+  "keywords": ["pi-package"],
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xorq-labs/pi-xorq-verification-example.git"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "pi": {
+    "extensions": ["./extensions"],
+    "skills": ["./skills"]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "catalog_path": ".xorq/catalog",
+  "expressions": [
+    {
+      "alias": "flights-by-origin",
+      "lineage": [
+        "flights.csv"
+      ]
+    }
+  ],
+  "reply_values": [
+    "ATL",
+    "17,875"
+  ],
+  "obligations": [
+    {
+      "id": "busiest-origin",
+      "kind": "argmax",
+      "surface": "ATL",
+      "value_type": {
+        "kind": "categorical",
+        "tolerance": "0"
+      },
+      "witness": {
+        "on": "flights-by-origin",
+        "compose": ""
+      },
+      "predicate": {
+        "select": "origin",
+        "metric_col": "n"
+      }
+    },
+    {
+      "id": "flight-count",
+      "kind": "argmax",
+      "surface": "17,875",
+      "value_type": {
+        "kind": "int",
+        "tolerance": "0"
+      },
+      "witness": {
+        "on": "flights-by-origin",
+        "compose": ""
+      },
+      "predicate": {
+        "select": "n",
+        "entity_col": "origin",
+        "entity_val": "ATL"
+      },
+      "requires_sources": [
+        "flights.csv"
+      ]
+    }
+  ]
+}

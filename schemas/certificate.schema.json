@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xorq.dev/schemas/pi-xorq-verifier/certificate.schema.json",
+  "title": "Verification certificate",
+  "description": "The re-checkable certificate emitted by pi-xorq-check for an ADR-0001 verification. Produced verbatim by the deterministic checker; the verifier returns it unchanged.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "obligations", "coverage", "soundness"],
+  "properties": {
+    "verdict": {
+      "description": "Turn-level verdict, a monotone fold over obligation statuses.",
+      "enum": ["VERIFIED", "DISCREPANCY", "COULD-NOT-VERIFY", "NO-OP"]
+    },
+    "obligations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "checks", "surface", "selected_cell", "witness_alias", "detail"],
+        "properties": {
+          "id": {"type": "string"},
+          "status": {
+            "description": "Per-obligation status on DISCHARGED ⊑ COULD-NOT-DISCHARGE ⊑ REFUTED.",
+            "enum": ["DISCHARGED", "COULD-NOT-DISCHARGE", "REFUTED"]
+          },
+          "checks": {
+            "description": "Named boolean checks recorded during discharge (well-formedness, predicate, faithfulness, provenance).",
+            "type": "object",
+            "additionalProperties": {"type": "boolean"}
+          },
+          "surface": {
+            "description": "The claimed value verbatim — the left-hand side of the typed equality the discharge tested. Disclosed so the certificate records what was checked, not just the outcome.",
+            "type": "string"
+          },
+          "selected_cell": {
+            "description": "The cell the witness selected, as text; null when nothing was selected — including every `table` obligation, whose content is the `grid` (a table has no single cell).",
+            "type": ["string", "null"]
+          },
+          "grid": {
+            "description": "Present only for a `table` obligation: the verified grid (what was confirmed), replacing selected_cell. `rows` are the claimed rows that matched the witness result under typed equality.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "columns": {"type": "array", "items": {"type": "string"}},
+              "rows": {"type": "array", "items": {"type": "object", "additionalProperties": {"type": "string"}}}
+            }
+          },
+          "value_type": {
+            "description": "The declared typing under which surface and selected_cell were compared. The tolerance is a producer-declared knob that widens acceptance, so it is disclosed here to be re-checkable.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {"type": "string"},
+              "tolerance": {"description": "The ε the typed-equality (≡_ε) admitted.", "type": "string"}
+            }
+          },
+          "witness_alias": {
+            "description": "The declared alias the witness was composed ON — its input/base, NOT the persisted witness. null when the witness did not run. (The persisted witness's own name, when cataloged, is witness_ref.)",
+            "type": ["string", "null"]
+          },
+          "witness_code": {
+            "description": "The compose code that discharges this obligation, so the certificate is re-runnable (`xorq catalog run <witness_alias> -c <witness_code>`). Empty when the witness did not run.",
+            "type": "string"
+          },
+          "witness_hash": {
+            "description": "A short content handle (sha256:<16 hex>) for witness_code — an integrity/dedup reference to the exact expression that was checked; empty when there was no witness.",
+            "type": "string"
+          },
+          "witness_ref": {
+            "description": "The cataloged alias of the PERSISTED witness — a composed `verify-<id>` entry (id = the obligation id) that was re-run and confirmed to reproduce this result — when catalog_witnesses is on; empty otherwise. This is the re-runnable expression's name, distinct from witness_alias (the base it composed on). Empty guarantees no such alias was left in the catalog (a failed round-trip is cleaned up, never orphaned).",
+            "type": "string"
+          },
+          "sources": {
+            "description": "The witness alias's ACTUAL lineage — one entry per op-tree leaf, recovered from the catalog (not producer-declared): the URL/path for a Read, or a `<in-memory>` / `<Type:name>` marker for a leaf with no source (a hand-built table). This is what the `no_local_sources` policy judges (`remote_sources` check). A local path or a `<in-memory>` marker here on a claimed-verified answer is the tell of data added straight to the catalog.",
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "catalog_state": {
+      "description": "A short content handle (sha256:<16 hex>) for the catalog.yaml manifest the obligations were discharged against — pins which catalog state produced this verdict. Empty when the manifest could not be read.",
+      "type": "string"
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uncovered"],
+      "properties": {
+        "uncovered": {
+          "description": "Surface values from reply_values not covered by any obligation; a non-empty list downgrades VERIFIED to COULD-NOT-VERIFY.",
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "soundness": {
+      "description": "The soundness boundary of the verdict.",
+      "type": "string"
+    }
+  }
+}

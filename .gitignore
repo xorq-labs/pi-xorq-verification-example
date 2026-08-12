@@ -1,0 +1,27 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+
+# node / pi package
+node_modules/
+.pi/git/
+.pi/npm/
+.pi-subagents/
+
+# local demo catalog + build artifacts (duel.sh recreates these)
+.xorq/
+
+# nix / direnv
+result
+result-*
+.direnv/
+
+# editor / os
+.DS_Store

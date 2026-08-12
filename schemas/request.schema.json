@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xorq.dev/schemas/pi-xorq-verifier/request.schema.json",
+  "title": "Verification request",
+  "description": "A set of declared proof obligations to discharge against a xorq catalog (ADR-0001 §6). The producer of a data answer emits this; pi-xorq-check (or the xorq_verify tool) discharges it into a certificate. Declaring obligations here is the strong path: the claim→expression binding is given, not inferred by the verifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["catalog_path", "obligations"],
+  "properties": {
+    "catalog_path": {
+      "description": "Path to the re-runnable xorq catalog.",
+      "type": "string"
+    },
+    "expressions": {
+      "description": "Declared aliases and their lineage; grounds the provenance check for obligations that carry requires_sources.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["alias"],
+        "properties": {
+          "alias": {"type": "string"},
+          "lineage": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "reply_values": {
+      "description": "Every surface value asserted by the answer; an uncovered value forces COULD-NOT-VERIFY (the coverage audit).",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "catalog_witnesses": {
+      "description": "Persist each DISCHARGED witness as a composed, re-runnable `verify-<id>` catalog entry (the certificate reports each as witness_ref). The xorq_verify tool defaults this to true; pass false for a throwaway check that should leave no trace in the catalog.",
+      "type": "boolean"
+    },
+    "no_local_sources": {
+      "description": "No-fabricated-inputs policy. When true, every obligation's witness alias must be built from re-fetchable data only, grounded in the alias's ACTUAL op-tree (not a declared list). It enforces two checks, both fail-closed to COULD-NOT-DISCHARGE: `remote_sources` — every leaf must be a Read from a remote URL (http/https/s3/gs/...); a local/scratch path, or an in-memory/hand-built table (surfaced as a `<in-memory>` leaf, even when joined to a real source), is rejected. `no_magic_constants` — no non-unit numeric literal may be hardcoded in the alias's arithmetic (a fabricated population/price typed into a mutate); unit scales like 100 or 100000 are allowed, so a data value must come from a joined column. The operator can force the policy on regardless of this field via the PI_XORQ_NO_LOCAL_SOURCES env var.",
+      "type": "boolean"
+    },
+    "obligations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/obligation"}
+    }
+  },
+  "$defs": {
+    "obligation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "kind", "surface", "witness", "predicate"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {
+          "description": "The predicate shape. Every kind listed here discharges end-to-end. Kinds without a discharge rule (compare/metric/metadata/provenance, ADR-0005 modes) are deliberately NOT in this contract — the checker still fails closed on an unknown kind, but the schema only advertises what verifies today.",
+          "enum": ["scalar", "argmax", "argmin", "count", "membership", "table"]
+        },
+        "surface": {
+          "description": "The value verbatim as written in the answer, e.g. \"17,875\". Required for the value kinds (it is the claimed value). Optional for a `table`, whose content is its grid (predicate.rows) — there `surface` is at most a label.",
+          "type": "string"
+        },
+        "value_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {"enum": ["int", "decimal", "percent", "currency", "date", "categorical"]},
+            "tolerance": {"description": "Decimal string ε for numeric kinds.", "type": "string"}
+          }
+        },
+        "witness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["on"],
+          "properties": {
+            "on": {
+              "description": "A DECLARED alias the witness composes on.",
+              "type": "string"
+            },
+            "compose": {
+              "description": "The POPULATION the witness ranges over: a restriction of the alias, e.g. source.filter(source.markets >= 25). Combine conditions by CHAINING filters — source.filter(a).filter(b) for AND — never source.filter((a) & (b)): the safe evaluator rejects bitwise &/|. For argmax/argmin/count/membership/table the checker builds the canonical ranking/aggregation ON TOP of this population and recomputes the extremum over the SAME population, so the judgment and its cross-check both come from the witness. Must be a clean restriction (a filter): no join, set op, or limit — those would fabricate or pre-narrow the population and are rejected. Empty = the whole alias. For an ungrounded scalar, compose is instead the full expression to evaluate. Validated over its op-tree: selection-only (no witness-added arithmetic), non-circular, rooted on the alias.",
+              "type": "string"
+            }
+          }
+        },
+        "predicate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "select": {"description": "Column whose cell equals `surface` in the witness result.", "type": "string"},
+            "entity_col": {"description": "Column the value is grounded to (the row must be this entity's).", "type": ["string", "null"]},
+            "entity_val": {"description": "The entity the value belongs to, e.g. \"ATL\".", "type": ["string", "null"]},
+            "metric_col": {"description": "For argmax/argmin: the column the extremum ranges over (the checker recomputes max/min over this column to discharge maximality — the quantifier is never declared, always recomputed). Required when `select` is not itself the ranked numeric column, e.g. an entity claim selecting `origin` ranked by `n`.", "type": ["string", "null"]},
+            "columns": {"description": "table kind: the columns compared against the witness grid (and, for a ranking, their display order).", "type": "array", "items": {"type": "string"}},
+            "rows": {"description": "table kind: the claimed rows, each an object of {column: value-as-written}. Compared to the witness result — positionally when ordered, else as an order-insensitive set.", "type": "array", "items": {"type": "object", "additionalProperties": {"type": "string"}}},
+            "ordered": {"description": "table kind: true = ranking/row (positional, needs metric_col to order); false = set (order-insensitive; the witness population defines membership). Default true.", "type": "boolean"},
+            "value_types": {"description": "table kind: per-column value types, {column: {kind, tolerance}}; columns not listed use the obligation's value_type.", "type": "object", "additionalProperties": {"type": "object"}}
+          }
+        },
+        "requires_sources": {
+          "description": "Sources the witness alias's lineage must cover (checked against expressions[].lineage).",
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

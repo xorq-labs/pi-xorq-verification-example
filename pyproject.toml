@@ -1,0 +1,51 @@
+[project]
+name = "pi-xorq-verifier"
+version = "0.1.0"
+description = "xorq-native answer verification for the pi coding agent"
+requires-python = ">=3.10"
+dependencies = [
+ "attrs>=23.2.0",
+ "click>=8.3.1",
+ "xorq>=0.3.38",
+]
+
+[project.scripts]
+pi-xorq-check = "pi_xorq_verifier.cli:cli"
+
+[build-system]
+# Upper bound tracks the uv in the dev env (flake.nix pkgs.uv, currently 0.11.x);
+# a range that excludes it makes every `xorq catalog add` wheel build warn.
+requires = ["uv_build>=0.9.0,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipython>=8.38.0",
+    "jsonschema>=4.23.0",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.14",
+]
+test = [
+    "coverage>=7.13.2",
+    "ipython>=8.38.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+]
+
+[tool.ruff.lint]
+extend-select = ["I", "ICN"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pi_xorq_verifier"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+lines-after-imports = 2
+
+[tool.pytest.ini_options]
+markers = [
+    "core",
+    "scripts",
+    "integration",
+]
+consider_namespace_packages = true
+addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"
