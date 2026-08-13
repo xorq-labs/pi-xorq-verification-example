@@ -73,6 +73,15 @@ python bench/hallucination_prompts.py   # recomputes both oracles from the data
 ./duel.sh national-sum                  # the memory-prior trap
 ```
 
+Want just the harness, no duel? `--no-claude` opens two panes — pi and the
+catalog TUI — so you watch the verification itself (ingest → compose → verify →
+banner, witnesses appearing on the right) without the bare-agent pane:
+
+```bash
+./duel.sh --no-claude                   # harness-only view
+./duel.sh --no-claude national-sum      # flags and trap ids combine
+```
+
 ## What the prompts are
 
 Both prompts in `bench/hallucination_prompts.py` are **traps with an executable
