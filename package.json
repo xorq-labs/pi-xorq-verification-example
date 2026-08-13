@@ -5,6 +5,9 @@
   "keywords": ["pi-package"],
   "license": "AGPL-3.0-or-later",
   "type": "module",
+  "scripts": {
+    "test": "node --test tests/extension/gate.test.mjs"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xorq-labs/pi-xorq-verification-example.git"

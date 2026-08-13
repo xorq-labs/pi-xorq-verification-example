@@ -80,8 +80,8 @@ class Predicate:
     # checker neither trusted nor required was pure contract noise).
     metric_col: str | None = None  # column an extremum ranges over (argmax/argmin/table)
     # The population a superlative/count ranges over is NOT a separate field — it
-    # lives in `witness.compose` (a restriction of the alias), so the judgment and
-    # its cross-check both derive from the one witness.
+    # lives in the obligation's `population` (a restriction of the alias), so the
+    # judgment and its cross-check both derive from the one witness.
     # table claims: the claimed grid compared against the witness result.
     columns: tuple[str, ...] = ()  # columns compared (and, for a ranking, display order)
     rows: tuple[tuple[tuple[str, str], ...], ...] = ()  # claimed rows as (col, value) pairs
@@ -90,22 +90,22 @@ class Predicate:
 
 
 @frozen(auto_attribs=True)
-class Witness:
-    """An expression composed over a declared alias."""
-
-    on: str = ""  # declared alias the witness composes on
-    compose: str = ""  # xorq compose code, e.g. source.order_by(_.n.desc()).limit(1)
-
-
-@frozen(auto_attribs=True)
 class Obligation:
-    """A declared claim paired with the expression meant to witness it."""
+    """A declared claim paired with the site the checker witnesses it on.
+
+    The producer declares the *witness site* — ``on`` (a declared alias),
+    ``population`` (a clean restriction of it), and the predicate. The witness
+    itself is synthesized by the checker from that declaration; only an
+    ungrounded scalar supplies the full expression via ``expression``.
+    """
 
     id: str
     kind: ClaimKind
     surface: str
-    witness: Witness
     predicate: Predicate
+    on: str = ""  # declared alias the witness is composed on (the site)
+    population: str = ""  # restriction of the alias the witness ranges over
+    expression: str = ""  # ungrounded scalar only: the full expression to evaluate
     value_type: ValueType = field(factory=ValueType)
     requires_sources: tuple[str, ...] = ()
 
@@ -116,7 +116,7 @@ class ObligationResult:
     status: ObligationStatus
     checks: tuple[tuple[str, bool], ...] = ()
     selected_cell: str | None = None
-    witness_alias: str | None = None
+    base_alias: str | None = None  # the declared alias the witness composed on
     detail: str = ""
     witness_code: str = ""  # the compose code that discharges this (re-runnable)
     witness_ref: str = ""  # cataloged alias of the verified witness, if persisted
@@ -562,7 +562,7 @@ def provenance_ok(
     lineage. Empty requirement holds trivially; unknown lineage cannot confirm."""
     if not ob.requires_sources:
         return True
-    lineage = dict(lineage_by_alias).get(ob.witness.on)
+    lineage = dict(lineage_by_alias).get(ob.on)
     if lineage is None:
         return False
     return frozenset(ob.requires_sources) <= frozenset(lineage)
@@ -637,13 +637,13 @@ def discharge(
     """
     from pi_xorq_verifier import witness  # noqa: PLC0415
 
-    alias_expr = witness.load_alias_expr(catalog_path, ob.witness.on)
+    alias_expr = witness.load_alias_expr(catalog_path, ob.on)
     if alias_expr is None:
         return ObligationResult(
             ob.id,
             ObligationStatus.COULD_NOT_DISCHARGE,
             (("witness_on_declared_alias", False),),
-            witness_alias=ob.witness.on,
+            base_alias=ob.on,
             detail="alias did not load from the catalog (or xorq unavailable)",
         )
     expr = witness.build_witness(alias_expr, ob)
@@ -657,7 +657,7 @@ def discharge(
             ob.id,
             ObligationStatus.COULD_NOT_DISCHARGE,
             checks,
-            witness_alias=ob.witness.on,
+            base_alias=ob.on,
             detail=reason or "ill-formed witness",
         )
     run = witness.run_expr(expr)
@@ -666,7 +666,7 @@ def discharge(
             ob.id,
             ObligationStatus.COULD_NOT_DISCHARGE,
             checks,
-            witness_alias=ob.witness.on,
+            base_alias=ob.on,
             detail="witness did not evaluate against the catalog",
         )
     status, predicate_checks, cell, detail = _discharge_predicate(ob, run)
@@ -690,7 +690,7 @@ def discharge(
     if no_local_sources:
         trusted = sources_trusted(sources, True)
         # Scan the alias AND the witness expression: an ungrounded scalar/metric
-        # fabricates its value in `witness.compose`, which the alias-only scan
+        # fabricates its value in `population`, which the alias-only scan
         # never sees (the compose-escape-hatch hole).
         constants = tuple(
             dict.fromkeys(
@@ -705,13 +705,13 @@ def discharge(
             status = ObligationStatus.COULD_NOT_DISCHARGE
             where = ", ".join(sources) if sources else "an in-memory/hand-added table"
             detail = (
-                f"local source not allowed: alias '{ob.witness.on}' reads from {where} — "
+                f"local source not allowed: alias '{ob.on}' reads from {where} — "
                 "ingest from a re-fetchable source (a URL) so the lineage is reproducible"
             )
         elif status is ObligationStatus.DISCHARGED and constants:
             status = ObligationStatus.COULD_NOT_DISCHARGE
             detail = (
-                f"fabricated constant not allowed: alias '{ob.witness.on}' hardcodes "
+                f"fabricated constant not allowed: alias '{ob.on}' hardcodes "
                 f"{', '.join(constants)} in its arithmetic — source it as a column "
                 "(join a sourced alias), not a literal typed from memory"
             )
@@ -723,7 +723,7 @@ def discharge(
         expected_rows = len(ob.predicate.rows) if ob.kind is ClaimKind.TABLE else None
         witness_ref = (
             witness.catalog_witness(
-                catalog_path, ob.witness.on, code, f"verify-{ob.id}", cell,
+                catalog_path, ob.on, code, f"verify-{ob.id}", cell,
                 ob.predicate.select, expected_rows=expected_rows,
             )
             or ""
@@ -733,7 +733,7 @@ def discharge(
         status,
         checks,
         selected_cell=cell,
-        witness_alias=ob.witness.on,
+        base_alias=ob.on,
         detail=detail,
         witness_code=code,
         witness_ref=witness_ref,
@@ -762,7 +762,7 @@ def _confirm_maximality(
     a non-extremal value and is refuted; an extremum that cannot be recomputed or
     co-selected fails closed rather than passing.
 
-    The quantifier ranges over the witness's population, so a ``witness.compose``
+    The quantifier ranges over the witness's population, so a ``population``
     restriction shrinks it — "ORD is busiest" over ``filter(origin != 'ATL')``
     genuinely maximizes its restricted set while contradicting the unrestricted
     claim, and the checker cannot see the prose to know which was meant. So a
@@ -773,7 +773,7 @@ def _confirm_maximality(
     # A witness that restricts the population (a non-empty compose) maximizes only
     # its scoped set; report it as `maximality_within_scope` (never bare
     # `maximality`) so it can't read as an unconditional superlative.
-    check = "maximality_within_scope" if ob.witness.compose else "maximality"
+    check = "maximality_within_scope" if ob.population else "maximality"
     metric = ob.predicate.metric_col or ob.predicate.select
     if not run.rows or metric not in run.columns:
         return (
@@ -929,7 +929,7 @@ def obligation_from_dict(d: dict) -> Obligation:
         value = d.get(key)
         return value if isinstance(value, dict) else {}
 
-    w, p, vt = _obj("witness"), _obj("predicate"), _obj("value_type")
+    p, vt = _obj("predicate"), _obj("value_type")
     p_rows = p.get("rows", ())
     rows = tuple(
         tuple((str(k), str(v)) for k, v in row.items())
@@ -942,18 +942,26 @@ def obligation_from_dict(d: dict) -> Obligation:
         for col, spec in (p_vtypes.items() if isinstance(p_vtypes, dict) else ())
         if isinstance(spec, dict)
     )
-    compose = w.get("compose", "")
     kind = ClaimKind(d["kind"])
     # `surface` is the claimed value for the value kinds (required — a missing one
     # is a genuinely malformed obligation). A `table`'s content is its grid, so
     # `surface` there is only an optional label — don't reject a table for lacking
     # one (that KeyError killed the whole request, losing every obligation).
     surface = str(d["surface"]) if kind is not ClaimKind.TABLE else str(d.get("surface", ""))
+    # The site is declared flat on the obligation: `on` (alias), `population`
+    # (restriction), and — for an ungrounded scalar only — `expression`. A
+    # non-string value coerces to "" and the obligation fails closed downstream.
+    def _str(key: str) -> str:
+        value = d.get(key)
+        return value if isinstance(value, str) else ""
+
     return Obligation(
         id=d["id"],
         kind=kind,
         surface=surface,
-        witness=Witness(on=w.get("on", ""), compose=compose),
+        on=_str("on"),
+        population=_str("population"),
+        expression=_str("expression"),
         predicate=Predicate(
             select=p.get("select", ""),
             entity_col=p.get("entity_col"),
@@ -981,7 +989,7 @@ def _obligation_to_dict(r: ObligationResult) -> dict:
         "surface": r.surface,
         "selected_cell": r.selected_cell,
         "value_type": {"kind": r.value_kind, "tolerance": r.tolerance},
-        "witness_alias": r.witness_alias,
+        "base_alias": r.base_alias,
         "witness_code": r.witness_code,
         "witness_hash": r.witness_hash,
         "witness_ref": r.witness_ref,

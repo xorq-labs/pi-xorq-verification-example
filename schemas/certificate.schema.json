@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xorq.dev/schemas/pi-xorq-verifier/certificate.schema.json",
   "title": "Verification certificate",
-  "description": "The re-checkable certificate emitted by pi-xorq-check for an ADR-0001 verification. Produced verbatim by the deterministic checker; the verifier returns it unchanged.",
+  "description": "The re-checkable certificate emitted by pi-xorq-check for an ADR-0001 verification. Produced verbatim by the deterministic checker; the verifier returns it unchanged. Witness terminology, in the order the layers arise: the request declares the SITE (`on` + `population`); the checker SYNTHESIZES the witness from it, disclosed here as witness_code (with witness_hash) over base_alias; a discharged witness may be PERSISTED as a re-runnable `verify-<id>` catalog entry, named here as witness_ref.",
   "type": "object",
   "additionalProperties": false,
   "required": ["verdict", "obligations", "coverage", "soundness"],
@@ -16,7 +16,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "status", "checks", "surface", "selected_cell", "witness_alias", "detail"],
+        "required": ["id", "status", "checks", "surface", "selected_cell", "base_alias", "detail"],
         "properties": {
           "id": {"type": "string"},
           "status": {
@@ -54,12 +54,12 @@
               "tolerance": {"description": "The ε the typed-equality (≡_ε) admitted.", "type": "string"}
             }
           },
-          "witness_alias": {
-            "description": "The declared alias the witness was composed ON — its input/base, NOT the persisted witness. null when the witness did not run. (The persisted witness's own name, when cataloged, is witness_ref.)",
+          "base_alias": {
+            "description": "The declared alias the witness was composed ON — the site's base (the request's `on`). null when the witness did not run.",
             "type": ["string", "null"]
           },
           "witness_code": {
-            "description": "The compose code that discharges this obligation, so the certificate is re-runnable (`xorq catalog run <witness_alias> -c <witness_code>`). Empty when the witness did not run.",
+            "description": "The synthesized witness itself, as compose code, so the certificate is re-runnable (`xorq catalog run <base_alias> -c <witness_code>`). Empty when the witness did not run.",
             "type": "string"
           },
           "witness_hash": {
@@ -67,7 +67,7 @@
             "type": "string"
           },
           "witness_ref": {
-            "description": "The cataloged alias of the PERSISTED witness — a composed `verify-<id>` entry (id = the obligation id) that was re-run and confirmed to reproduce this result — when catalog_witnesses is on; empty otherwise. This is the re-runnable expression's name, distinct from witness_alias (the base it composed on). Empty guarantees no such alias was left in the catalog (a failed round-trip is cleaned up, never orphaned).",
+            "description": "The cataloged alias of the PERSISTED witness — a composed `verify-<id>` entry (id = the obligation id) that was re-run and confirmed to reproduce this result — when catalog_witnesses is on; empty otherwise. This is the re-runnable expression's name, distinct from base_alias (the base it composed on). Empty guarantees no such alias was left in the catalog (a failed round-trip is cleaned up, never orphaned).",
             "type": "string"
           },
           "sources": {

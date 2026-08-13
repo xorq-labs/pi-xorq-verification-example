@@ -21,10 +21,7 @@
         "kind": "categorical",
         "tolerance": "0"
       },
-      "witness": {
-        "on": "flights-by-origin",
-        "compose": ""
-      },
+      "on": "flights-by-origin",
       "predicate": {
         "select": "origin",
         "metric_col": "n"
@@ -38,10 +35,7 @@
         "kind": "int",
         "tolerance": "0"
       },
-      "witness": {
-        "on": "flights-by-origin",
-        "compose": ""
-      },
+      "on": "flights-by-origin",
       "predicate": {
         "select": "n",
         "entity_col": "origin",

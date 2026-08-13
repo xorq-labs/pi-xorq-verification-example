@@ -432,9 +432,12 @@ export default function (pi: ExtensionAPI) {
     description:
       "Run the deterministic checker over a set of DECLARED expressions and " +
       "OBLIGATIONS and return one re-checkable certificate. Each obligation is " +
-      "{id, kind, surface, witness:{on, compose}, predicate, value_type, " +
-      "requires_sources}. Verify a TABLE/RANKING as one `kind:table` obligation " +
-      "(predicate.columns/rows/ordered/metric_col, population in witness.compose) so every cell and the " +
+      "{id, kind, surface, on, population?, predicate, value_type, " +
+      "requires_sources} — you declare the witness SITE (`on` = a declared alias, " +
+      "`population` = a plain filter restricting it); the checker synthesizes and " +
+      "re-runs the witness itself. Only an ungrounded scalar passes `expression` " +
+      "(its full expression). Verify a TABLE/RANKING as one `kind:table` obligation " +
+      "(predicate.columns/rows/ordered/metric_col, population in `population`) so every cell and the " +
       "ordering are checked — do not cherry-pick scalars from a table. Put EVERY " +
       "number you will print in `reply_values` (uncovered values downgrade to " +
       "COULD-NOT-VERIFY). A superlative/ranking claim in your prose ('highest', " +

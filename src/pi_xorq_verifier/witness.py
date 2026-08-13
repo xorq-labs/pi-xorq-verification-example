@@ -211,28 +211,29 @@ def _snapshot(alias_expr, catalog_path: str, cache_dir: str | None):
 
 
 # --------------------------------------------------------------------------- #
-# Building the witness — synthesize the canonical query over the population.     #
-#                                                                               #
-# There is no separate `scope`: the population a superlative/count ranges over  #
-# lives in the witness itself — `witness.compose`, a *restriction* of the alias #
-# (a filter), or the whole alias when compose is empty. The checker adds the    #
-# canonical ranking/aggregation on top, so a producer cannot smuggle a wrong    #
-# sort or a pre-narrowed limit through. The SAME population feeds the maximality #
-# recompute (`recompute_extremum`), so the cross-check is provably over exactly  #
-# what the witness ranked — the judgment and its check both come from the        #
-# witness, with nothing declared on the side.                                   #
+# Building the witness — synthesize the canonical query over the population.   #
+#                                                                              #
+# The obligation declares the witness SITE, never the witness: `on` (a         #
+# declared alias) and `population` (a *restriction* of it — a filter — or the  #
+# whole alias when empty). The checker adds the canonical ranking/aggregation  #
+# on top, so a producer cannot smuggle a wrong sort or a pre-narrowed limit    #
+# through. The SAME population feeds the maximality recompute                  #
+# (`recompute_extremum`), so the cross-check is provably over exactly what the #
+# witness ranked — the judgment and its check both come from the witness, with #
+# nothing declared on the side. Only an ungrounded scalar (and the             #
+# non-synthesized kinds) supplies a full expression, via `expression`.         #
 # --------------------------------------------------------------------------- #
 
 
 def build_witness(alias_expr, ob):
     """Build the witness for ``ob`` composed on ``alias_expr``.
 
-    Synthesize the canonical expression over the population (``witness.compose``
+    Synthesize the canonical expression over the population (``population``
     restriction, else the alias). ``None`` if it will not build. For the
     synthesizable kinds a failed synthesis fails closed — it never falls back to
-    evaluating ``compose`` as a whole witness, so a producer cannot bypass the
+    evaluating producer code as a whole witness, so a producer cannot bypass the
     canonical ranking. Only the non-synthesized kinds (an ungrounded scalar,
-    ``compare``/``metric``) use ``compose`` as the full expression.
+    ``compare``/``metric``) evaluate ``expression`` as the full witness.
     """
     from pi_xorq_verifier.checker import ClaimKind  # noqa: PLC0415
 
@@ -249,11 +250,10 @@ def build_witness(alias_expr, ob):
             ClaimKind.MEMBERSHIP,
             ClaimKind.TABLE,
         ):
-            return None  # fail closed — no raw-compose bypass of the canonical shape
-        compose = ob.witness.compose
-        if not compose:
+            return None  # fail closed — no raw-expression bypass of the canonical shape
+        if not ob.expression:
             return None
-        return _eval_code(normalize_compose(compose), alias_expr)
+        return _eval_code(normalize_compose(ob.expression), alias_expr)
     except Exception:
         return None
 
@@ -274,30 +274,45 @@ def build_error(alias_expr, ob) -> str:
     except Exception:
         cols = ()
     p = ob.predicate
-    # The population lives in witness.compose (a restriction of the alias); it must
-    # compose on `source` and stay a clean restriction (no join/set/limit/arith).
-    if ob.witness.compose:
+    # An ungrounded scalar is the one kind whose witness is not synthesized: it
+    # needs `expression` (the full expression). A population alone selects no
+    # cell — the split exists so a full expression can never pose as a
+    # population (or vice versa).
+    if (
+        ob.kind is ClaimKind.SCALAR
+        and not ob.expression
+        and not (p.entity_col and p.entity_val is not None)
+    ):
+        return (
+            "an ungrounded scalar needs `expression` — the full expression whose "
+            "cell is the claimed value, e.g. source.aggregate(total=source.n.sum()) "
+            "— `population` only restricts the alias for the synthesized kinds; "
+            "or ground the value with predicate.entity_col/entity_val"
+        )
+    # The declared `population` (a restriction of the alias) must compose on
+    # `source` and stay a clean restriction (no join/set/limit/arith).
+    if ob.population:
         try:
-            pop = _population(alias_expr, ob.witness.compose)
+            pop = _population(alias_expr, ob.population)
         except Exception as exc:  # noqa: BLE001
             # The AST-whitelisted evaluator rejects `&`/`|` (bitwise), but ibis
             # filters use exactly those to combine conditions — so a compound
             # filter must be *chained*, not `&`-ed. Point at that specifically.
-            if "&" in ob.witness.compose or "|" in ob.witness.compose:
+            if "&" in ob.population or "|" in ob.population:
                 return (
-                    "witness.compose combines conditions with `&`/`|`, which the "
+                    "population combines conditions with `&`/`|`, which the "
                     "safe evaluator rejects — chain filters instead: "
                     "source.filter(a).filter(b) for AND (not "
                     "source.filter((a) & (b)))"
                 )
             return (
-                f"witness.compose did not compose on `source` — write it as a full "
+                f"population did not compose on `source` — write it as a full "
                 f"expression, e.g. source.filter(source.col >= 25), not "
-                f"{ob.witness.compose!r} ({type(exc).__name__})"
+                f"{ob.population!r} ({type(exc).__name__})"
             )
         if pop is not None and not _clean_restriction(pop, alias_expr):
             return (
-                "witness.compose must be a restriction of the alias (a filter) — it "
+                "population must be a restriction of the alias (a filter) — it "
                 "may not add a join, set op, or limit, which would fabricate or "
                 "pre-narrow the population the checker ranks/counts over"
             )
@@ -323,14 +338,14 @@ def build_error(alias_expr, ob) -> str:
     return ""
 
 
-def _population(alias_expr, compose: str):
-    """The population a witness ranges over: the alias restricted by
-    ``witness.compose`` (a filter), or the whole alias when compose is empty.
+def _population(alias_expr, restriction: str):
+    """The population a witness ranges over: the alias restricted by the
+    obligation's ``population`` (a filter), or the whole alias when empty.
     This is the single source of the population — used to *build* the witness and
     to *cross-check* it (the maximality recompute), so the two can never diverge."""
-    if not compose:
+    if not restriction:
         return alias_expr
-    return _eval_code(normalize_compose(compose), alias_expr)
+    return _eval_code(normalize_compose(restriction), alias_expr)
 
 
 def _clean_restriction(pop_expr, alias_expr) -> bool:
@@ -372,7 +387,7 @@ def _metric_col(expr, ob) -> str | None:
 def _synthesize(alias_expr, ob):
     """Canonical witness over the population, or ``None`` to fail closed / fall back.
 
-    The population is ``witness.compose`` (a clean restriction of the alias) or
+    The population is ``population`` (a clean restriction of the alias) or
     the whole alias. Superlatives/counts require a *clean* restriction (no
     fabricating/narrowing op) so the checker's recompute is trustworthy; a
     population that is not clean returns ``None`` (fail closed, never a guess).
@@ -381,7 +396,7 @@ def _synthesize(alias_expr, ob):
 
     p = ob.predicate
     try:
-        pop = _population(alias_expr, ob.witness.compose)
+        pop = _population(alias_expr, ob.population)
     except Exception:
         return None
     if pop is None or not _clean_restriction(pop, alias_expr):
@@ -547,7 +562,7 @@ def magic_constants(expr) -> tuple[str, ...]:
 
     Filter thresholds (literals inside comparisons) and unit scales (100, 100000)
     are not flagged. Runs over the alias AND the witness expression, so a value
-    fabricated in ``witness.compose`` cannot slip past the alias-only scan."""
+    fabricated in ``population`` cannot slip past the alias-only scan."""
     if not _AVAILABLE or expr is None:
         return ()
     try:
@@ -730,7 +745,7 @@ def _shape_ok(expr, ob) -> bool:
 def recompute_extremum(alias_expr, ob) -> str | None:
     """The true extremum of the metric over the witness's population, as text.
 
-    The population is the *same* one the witness ranks — ``witness.compose`` (a
+    The population is the *same* one the witness ranks — ``population`` (a
     clean restriction of the alias) or the whole alias — so this cross-check is
     provably over exactly what the witness ranked, with nothing declared on the
     side. An argmax claim holds only if the witness's extremum cell equals the
@@ -746,7 +761,7 @@ def recompute_extremum(alias_expr, ob) -> str | None:
     if metric is None:
         return None
     try:
-        pop = _population(alias_expr, ob.witness.compose)
+        pop = _population(alias_expr, ob.population)
         if pop is None or not _clean_restriction(pop, alias_expr):
             return None
         if metric not in pop.columns:
@@ -768,7 +783,7 @@ def recompute_extremum(alias_expr, ob) -> str | None:
 # A DISCHARGED witness can be persisted as a first-class *composed* catalog entry
 # so the verified value is re-derivable by anyone (`xorq catalog run verify-<id>`).
 # `witness_code` renders the witness as `xorq catalog compose -c` code — the
-# canonical query built over the population (``witness.compose`` or the alias).
+# canonical query built over the population (``population`` or the alias).
 # Reductions use ``xo._`` (the deferred current relation), because a restricted
 # ``source.count()`` binds to the wrong relation and errors; ``xo._.count()``
 # counts the population's rows.
@@ -790,9 +805,11 @@ def witness_code(alias_expr, ob) -> str | None:
         cols = tuple(alias_expr.columns)
     except Exception:
         return None
-    # The population base: the producer's compose restriction, or the whole alias.
-    base = normalize_compose(ob.witness.compose) if ob.witness.compose else "source"
-    escape = normalize_compose(ob.witness.compose) if ob.witness.compose else None
+    # The population base: the declared restriction, or the whole alias. The
+    # escape hatch (ungrounded scalar / non-synthesized kinds) is the producer's
+    # full `expression` — the one place producer code IS the witness.
+    base = normalize_compose(ob.population) if ob.population else "source"
+    escape = normalize_compose(ob.expression) if ob.expression else None
     match ob.kind:
         case ClaimKind.ARGMAX | ClaimKind.ARGMIN:
             metric = _metric_col(alias_expr, ob)

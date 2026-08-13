@@ -44,9 +44,10 @@
   },
   "$defs": {
     "obligation": {
+      "description": "A declared claim plus its WITNESS SITE. Terminology: the producer declares the site — `on` (a declared alias), `population` (a clean restriction of it), and the predicate. The witness itself — the expression that is re-run to discharge the claim — is SYNTHESIZED by the checker from that declaration (the certificate discloses it as witness_code and, when persisted, witness_ref). The producer never writes the check; a mis-declared site can weaken what is claimed, never forge how it is verified. The one exception is an ungrounded scalar, whose full expression the producer supplies via `expression`.",
       "type": "object",
       "additionalProperties": true,
-      "required": ["id", "kind", "surface", "witness", "predicate"],
+      "required": ["id", "kind", "surface", "on", "predicate"],
       "properties": {
         "id": {"type": "string"},
         "kind": {
@@ -65,20 +66,17 @@
             "tolerance": {"description": "Decimal string ε for numeric kinds.", "type": "string"}
           }
         },
-        "witness": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["on"],
-          "properties": {
-            "on": {
-              "description": "A DECLARED alias the witness composes on.",
-              "type": "string"
-            },
-            "compose": {
-              "description": "The POPULATION the witness ranges over: a restriction of the alias, e.g. source.filter(source.markets >= 25). Combine conditions by CHAINING filters — source.filter(a).filter(b) for AND — never source.filter((a) & (b)): the safe evaluator rejects bitwise &/|. For argmax/argmin/count/membership/table the checker builds the canonical ranking/aggregation ON TOP of this population and recomputes the extremum over the SAME population, so the judgment and its cross-check both come from the witness. Must be a clean restriction (a filter): no join, set op, or limit — those would fabricate or pre-narrow the population and are rejected. Empty = the whole alias. For an ungrounded scalar, compose is instead the full expression to evaluate. Validated over its op-tree: selection-only (no witness-added arithmetic), non-circular, rooted on the alias.",
-              "type": "string"
-            }
-          }
+        "on": {
+          "description": "A DECLARED alias the checker composes the witness on — the site's base. The witness itself is synthesized; this only names where it lives.",
+          "type": "string"
+        },
+        "population": {
+          "description": "The POPULATION the witness ranges over: a restriction of the alias, e.g. source.filter(source.markets >= 25). Combine conditions by CHAINING filters — source.filter(a).filter(b) for AND — never source.filter((a) & (b)): the safe evaluator rejects bitwise &/|. For argmax/argmin/count/membership/table the checker builds the canonical ranking/aggregation ON TOP of this population and recomputes the extremum over the SAME population, so the judgment and its cross-check both come from the witness. Must be a clean restriction (a filter): no join, set op, or limit — those would fabricate or pre-narrow the population and are rejected. Empty/omitted = the whole alias. Validated over its op-tree: selection-only, non-circular, rooted on the alias.",
+          "type": "string"
+        },
+        "expression": {
+          "description": "UNGROUNDED SCALAR ONLY: the full expression whose cell is the claimed value, e.g. source.aggregate(total=source.n.sum()) — the one kind whose witness the checker cannot synthesize. Ignored for the synthesized kinds (they fail closed rather than evaluate producer code as the witness). Validated over its op-tree like `population`.",
+          "type": "string"
         },
         "predicate": {
           "type": "object",

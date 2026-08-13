@@ -143,9 +143,8 @@ docs/adr/0001                  the verification model, in full
 flake.nix                      pinned env: python (xorq + checker), pi, tmux
 ```
 
-This repo is a self-contained snapshot of
-[pi-xorq-verifier](https://github.com/xorq-labs/pi-xorq-verifier) packaged as a
-runnable demo; see that repo for the maintained checker and extension.
+This repo is self-contained: the deterministic checker, the pi extension, the
+duel harness, and the formal model (ADR-0001) all live here.
 
 ## License
 

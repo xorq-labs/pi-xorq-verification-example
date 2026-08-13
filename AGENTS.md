@@ -62,21 +62,24 @@ never pad a pre-rounded column with zeros.
    `source` (e.g. `source.order_by(source.n.desc()).limit(1).select('origin',
    'n')`). The value exactly as returned is the only thing you may state.
 
-3. **Declare one obligation per number.** You give a *predicate*; the checker
-   builds and re-runs the witness from it. Set: `surface` (the value as you
-   will write it); `kind` (`argmax`/`argmin` for a superlative, `count`,
-   `membership`, `table` for a ranking/grid, `scalar` otherwise);
-   `witness.on` (the alias); `predicate.select` (the column whose cell equals
-   `surface`); `value_type.kind` (`int`/`decimal`/`currency`/`percent`/`date`,
-   or `categorical` for a text code). For an entity-grounded value ("ATL's
-   revenue") set `predicate.entity_col`/`entity_val`. For a superlative set
+3. **Declare one obligation per number.** You declare the *site and predicate*
+   — never the check: the checker synthesizes and re-runs the witness itself.
+   Set: `surface` (the value as you will write it); `kind` (`argmax`/`argmin`
+   for a superlative, `count`, `membership`, `table` for a ranking/grid,
+   `scalar` otherwise); `on` (the alias); `predicate.select` (the column whose
+   cell equals `surface`); `value_type.kind`
+   (`int`/`decimal`/`currency`/`percent`/`date`, or `categorical` for a text
+   code). For an entity-grounded value ("ATL's revenue") set
+   `predicate.entity_col`/`entity_val`. For a superlative set
    `predicate.metric_col` = the ranked column — the checker recomputes the
    extremum and refuses anything else. For a scoped superlative/count put the
-   population in `witness.compose` as a plain restriction of the alias —
-   chained filters only (`source.filter(a).filter(b)`; no `&`/`|`, joins, or
-   limits). For a table/ranking, declare ONE `table` obligation covering every
-   row and column you print (`predicate.columns`, `predicate.rows`,
-   `ordered`, per-column `value_types`) — never cherry-pick a few cells.
+   population in `population` as a plain restriction of the alias — chained
+   filters only (`source.filter(a).filter(b)`; no `&`/`|`, joins, or limits).
+   Only an ungrounded scalar takes `expression` (the full expression whose
+   cell is the value). For a table/ranking, declare ONE `table` obligation
+   covering every row and column you print (`predicate.columns`,
+   `predicate.rows`, `ordered`, per-column `value_types`) — never cherry-pick
+   a few cells.
 
 4. **Self-verify — cover every number you print.** Call `xorq_verify` once
    with `{ catalog_path, expressions, obligations, reply_values }`, where

@@ -613,6 +613,31 @@ its abuse path is closed by the coverage downgrade); and the equal-bounds
 circularity, `<in-memory>` leaf markers, and magic-constants scans (each closes a
 demonstrated exploit).
 
+### Update 2026-08-13 (witness site rename — the declared thing is not the witness)
+
+The word "witness" was doing three jobs — the obligation field the *producer*
+declares, the expression the checker *synthesizes* (`witness_code`), and the
+persisted `verify-<id>` entry (`witness_ref`) — and the misnamed one was the
+security-critical one: calling the producer-declared field `witness` suggested
+the untrusted side writes the check, when the load-bearing property is exactly
+that it does not. The contract is renamed to say what each part is; the
+decision procedure is unchanged:
+
+- **Request:** the nested `witness: {on, compose}` flattens into the obligation
+  as `on` (the declared alias — the *site's base*) and `population` (the clean
+  restriction the witness ranges over). `compose`'s second, overloaded role —
+  the full expression for an *ungrounded scalar*, the one kind the checker
+  cannot synthesize — splits out as `expression`, so a full expression can
+  never pose as a population (or vice versa; the synthesized kinds fail closed
+  rather than evaluate producer code as the witness, exactly as before).
+- **Certificate:** `witness_alias` — a name that needed a "NOT the persisted
+  witness" disclaimer in its own description — becomes `base_alias`. The parts
+  that genuinely name the witness (`witness_code`, `witness_hash`,
+  `witness_ref`) keep their names, as do the persisted `verify-<id>` entries.
+- The checker's ungrounded-scalar `build_error` now self-explains ("needs
+  `expression`") instead of returning nothing, closing the diagnostic gap the
+  split exposed.
+
 ## References
 
 - xorq-desktop: `docs/adr/0005-verification-engine-over-the-catalog.md`,
