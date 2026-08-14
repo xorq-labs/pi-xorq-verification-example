@@ -22,6 +22,10 @@ builds/
 # per-machine trial artifacts (bench/trial_runs.py)
 bench/trials/
 
+# raw recordings (record.sh) — only the rendered README gif is tracked
+*.cast
+*.rec
+
 # nix / direnv
 result
 result-*
