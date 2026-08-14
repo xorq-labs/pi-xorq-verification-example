@@ -65,6 +65,41 @@ def test_count_aggregate_verified(sample_catalog):
     assert check_obligations((ob,), sample_catalog).verdict is Verdict.VERIFIED
 
 
+def test_ungrounded_scalar_synthesized_from_select(sample_catalog):
+    # No `expression`: predicate.select names a real column, so the checker
+    # synthesizes the selection itself (the shape every producer tries first —
+    # this used to dead-end in an "needs `expression`" retry loop). The
+    # population narrows the alias to one row so the cell is unambiguous.
+    ob = Obligation(
+        id="c1",
+        kind=ClaimKind.SCALAR,
+        surface="17,875",
+        on="flights-by-origin",
+        population="source.filter(source.origin == 'ATL')",
+        predicate=Predicate(select="n"),
+        value_type=ValueType(kind="int"),
+    )
+    cert = check_obligations((ob,), sample_catalog)
+    assert cert.verdict is Verdict.VERIFIED
+    assert cert.results[0].selected_cell == "17875"
+    assert cert.results[0].witness_code.endswith(".select('n')")
+
+
+def test_ungrounded_scalar_ambiguous_select_fails_closed(sample_catalog):
+    # The synthesized selection over a multi-row population holds distinct
+    # cells — the claim's grain does not match, and it must NOT discharge
+    # against whichever row comes first.
+    ob = Obligation(
+        id="c1",
+        kind=ClaimKind.SCALAR,
+        surface="17,875",
+        on="flights-by-origin",
+        predicate=Predicate(select="n"),
+        value_type=ValueType(kind="int"),
+    )
+    assert check_obligations((ob,), sample_catalog).verdict is Verdict.COULD_NOT_VERIFY
+
+
 def test_missing_alias_could_not_verify(sample_catalog):
     ob = Obligation(
         id="c1",

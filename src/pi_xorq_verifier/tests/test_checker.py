@@ -1201,11 +1201,21 @@ def test_build_error_names_malformations(flights):
     )
     msg = witness_mod.build_error(flights, ampersand)
     assert "chain filters" in msg and "&" in msg  # points at chaining, not "full expression"
+    # An ungrounded scalar whose select names a REAL column is well-formed now —
+    # the checker synthesizes the selection itself (no `expression` round-trip).
     bare_scalar = Obligation(
         id="bare", kind=ClaimKind.SCALAR, surface="1",
         on="a", predicate=Predicate(select="n"),
     )
-    assert "needs `expression`" in witness_mod.build_error(flights, bare_scalar)
+    assert witness_mod.build_error(flights, bare_scalar) == ""
+    # With no usable select (empty, or not an alias column), the hint names both
+    # ways out: predicate.select on a real column, or a full `expression`.
+    unnamed_scalar = Obligation(
+        id="unnamed", kind=ClaimKind.SCALAR, surface="1",
+        on="a", predicate=Predicate(select="not_a_column"),
+    )
+    msg = witness_mod.build_error(flights, unnamed_scalar)
+    assert "predicate.select" in msg and "`expression`" in msg
     well_formed = Obligation(
         id="ok", kind=ClaimKind.SCALAR, surface="1",
         on="a", expression="source.select('n')", predicate=Predicate(select="n"),
@@ -1405,6 +1415,25 @@ def test_obligation_from_dict_coerces_nondict_subobjects():
 def test_obligation_from_dict_rejects_nondict_obligation():
     with pytest.raises(ValueError):
         obligation_from_dict("just a string")
+
+
+@pytest.mark.core
+def test_obligation_from_dict_rejects_bool_requires_sources():
+    # LLM producers guessed `requires_sources: true` in nearly every run;
+    # tuple(True) surfaced as the impenetrable "'bool' object is not iterable".
+    # The error must now say what the field is and how to fix the request.
+    base = {"id": "c", "kind": "scalar", "surface": "6", "on": "a", "predicate": {}}
+    with pytest.raises(ValueError, match="list of source URLs"):
+        obligation_from_dict(dict(base, requires_sources=True))
+    # A single URL string is unambiguous — coerce, don't reject.
+    ob = obligation_from_dict(dict(base, requires_sources="https://h/d.csv"))
+    assert ob.requires_sources == ("https://h/d.csv",)
+    # predicate.columns has the same trap: a bare string must not iterate chars.
+    ob = obligation_from_dict(
+        {"id": "t", "kind": "table",
+         "predicate": {"columns": "state", "rows": [{"state": "x"}]}}
+    )
+    assert ob.predicate.columns == ("state",)
 
 
 @pytest.mark.core

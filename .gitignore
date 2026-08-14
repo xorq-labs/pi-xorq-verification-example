@@ -19,6 +19,9 @@ node_modules/
 .xorq/
 builds/
 
+# per-machine trial artifacts (bench/trial_runs.py)
+bench/trials/
+
 # nix / direnv
 result
 result-*

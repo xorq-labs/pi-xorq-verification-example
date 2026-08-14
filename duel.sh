@@ -50,6 +50,16 @@ for arg in "$@"; do
   esac
 done
 
+# Recording support (see record.sh). tmux repaints with absolute cursor moves,
+# so a session that changes size mid-recording garbles the cast. With
+# DUEL_COLS/DUEL_ROWS set, the session is created at exactly that geometry and
+# pinned (window-size=manual), so no client attach or resize ever repaints it.
+# DUEL_DETACH=1 skips the final attach (the recorder attaches its own client).
+SIZE_ARGS=()
+if [ -n "${DUEL_COLS:-}" ]; then
+  SIZE_ARGS+=(-x "$DUEL_COLS" -y "${DUEL_ROWS:-50}")
+fi
+
 # The prompt is baited so a wrong answer is provable against the cited sources.
 # Pick a trap by id; ids and oracles live in bench/hallucination_prompts.py.
 # The default is a cross-dataset ratio (markets total ÷ census US population):
@@ -61,7 +71,9 @@ if ! PROMPT="$(python bench/hallucination_prompts.py --duel "$TRAP_ID")"; then
   printf '%s\n' "$PROMPT" >&2  # on an unknown id, bench prints the valid ids
   exit 1
 fi
-CATALOG_SETUP="rm -rf .xorq/ && mkdir .xorq && xorq catalog -p .xorq/catalog init && xorq catalog -p .xorq/catalog tui"
+# The TUI polls the catalog on an interval (default 10s); 2s keeps the right
+# pane tracking the agent's ingests and verify-<id> witnesses almost live.
+CATALOG_SETUP="rm -rf .xorq/ && mkdir .xorq && xorq catalog -p .xorq/catalog init && xorq catalog -p .xorq/catalog tui --refresh 2"
 
 # Pre-authorize claude in its fresh dir so it never prompts for tool use —
 # no --dangerously-skip-permissions needed. The allow-list grants the built-in
@@ -111,17 +123,24 @@ tmux kill-session -t "$SESSION" 2>/dev/null || true
 
 if [ "$SOLO" -eq 1 ]; then
   # Two panes: pi (left, 55%) and the catalog TUI (right) — no bare agent.
-  PANE_PI=$(tmux new-session -d -s "$SESSION" -c "$REPO_DIR" -e PATH="$PATH" -P -F '#{pane_id}')
+  PANE_PI=$(tmux new-session -d -s "$SESSION" -c "$REPO_DIR" -e PATH="$PATH" ${SIZE_ARGS[@]+"${SIZE_ARGS[@]}"} -P -F '#{pane_id}')
   PANE_CAT=$(tmux split-window -h -l 45% -t "$PANE_PI" -c "$REPO_DIR" -e PATH="$PATH" -P -F '#{pane_id}')
 else
   # Left pane: detached session rooted in the tmp dir (empty context for claude).
-  PANE_CLAUDE=$(tmux new-session -d -s "$SESSION" -c "$TMP_DIR" -e PATH="$PATH" -P -F '#{pane_id}')
+  PANE_CLAUDE=$(tmux new-session -d -s "$SESSION" -c "$TMP_DIR" -e PATH="$PATH" ${SIZE_ARGS[@]+"${SIZE_ARGS[@]}"} -P -F '#{pane_id}')
 
   # Middle pane: pi takes 75% of the width, leaving claude at 1/4 of the screen.
   PANE_PI=$(tmux split-window -h -l 75% -t "$PANE_CLAUDE" -c "$REPO_DIR" -e PATH="$PATH" -P -F '#{pane_id}')
 
   # Right pane: split pi's space evenly with the catalog (~3/8 of the screen each).
   PANE_CAT=$(tmux split-window -h -t "$PANE_PI" -c "$REPO_DIR" -e PATH="$PATH" -P -F '#{pane_id}')
+fi
+
+# Pin the geometry: with window-size=manual, an attaching client (the
+# recorder's, or yours) views the window at its created size instead of
+# resizing it — the repaint-on-attach that garbles casts never happens.
+if [ -n "${DUEL_COLS:-}" ]; then
+  tmux set-option -t "$SESSION" window-size manual
 fi
 
 # Set up the catalog FIRST — everything else depends on it existing.
@@ -174,5 +193,10 @@ if [ "$SOLO" -eq 0 ]; then
 } &
 fi
 
-# Attach immediately so the panes are visible from the start.
-tmux attach-session -t "$SESSION"
+# Attach immediately so the panes are visible from the start — unless a
+# recorder (record.sh) is about to attach its own client.
+if [ "${DUEL_DETACH:-0}" = "1" ]; then
+  echo "session '$SESSION' running detached — attach with: tmux attach -t $SESSION"
+else
+  tmux attach-session -t "$SESSION"
+fi

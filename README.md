@@ -5,6 +5,8 @@ hallucination-bait question is fed to two coding agents at once, and you watch
 one of them answer from memory-ish vibes while the other is forced to *prove*
 every number it prints.
 
+![The three-pane duel: bare claude, pi + xorq verification, catalog TUI](verification-pi-xorq-claude-demo.gif)
+
 ```
 ┌───────────────┬──────────────────────────┬──────────────────────────┐
 │ claude (bare) │ pi + xorq verification   │ xorq catalog TUI         │
@@ -80,6 +82,34 @@ banner, witnesses appearing on the right) without the bare-agent pane:
 ```bash
 ./duel.sh --no-claude                   # harness-only view
 ./duel.sh --no-claude national-sum      # flags and trap ids combine
+```
+
+### Record a cast
+
+Recording a live `tmux attach` naively garbles playback: the session resizes
+on attach (tmux repaints with absolute cursor moves, so any mid-cast size
+change corrupts the replay), and tmux emits escape sequences in your outer
+terminal's dialect (ghostty/kitty TERMs bake in sequences the asciinema
+player can't render). `record.sh` fixes both — it pins the session at a fixed
+geometry before anything boots and records a plain-`TERM` client:
+
+```bash
+./record.sh demo.cast                   # the 3-pane duel at 213x50
+./record.sh demo.cast --no-claude       # the harness-only view
+COLS=180 ROWS=45 ./record.sh demo.cast  # smaller geometry
+agg demo.cast demo.gif                  # render a gif (agg is in the shell)
+```
+
+Your terminal must be at least as large as the recording geometry, and don't
+resize it mid-recording. Detach (`prefix-d`) to stop.
+
+A default `agg` render of a 90-second 213x50 cast is ~8 MB — too heavy for a
+README that every clone carries forever. The gif at the top of this one is the
+same cast at ~2.6 MB, small type and fewer frames, then requantized:
+
+```bash
+agg --font-size 10 --fps-cap 10 --idle-time-limit 1 demo.cast demo.gif
+gifsicle -O3 --lossy=90 --colors 48 demo.gif -o demo-small.gif
 ```
 
 ## What the prompts are

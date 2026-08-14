@@ -620,6 +620,7 @@ def discharge(
     lineage_by_alias: tuple[tuple[str, tuple[str, ...]], ...] = (),
     catalog_witnesses: bool = False,
     no_local_sources: bool = False,
+    exec_cache_dir: str | None = None,
 ) -> ObligationResult:
     """Discharge one obligation against the catalog (ADR-0001 §2).
 
@@ -634,6 +635,14 @@ def discharge(
     the certificate is re-runnable. When ``catalog_witnesses`` and the obligation
     ``DISCHARGED``, the witness is also persisted as a composed catalog entry
     (``verify-<id>``) and its alias recorded in ``witness_ref`` (ADR-0001 §4).
+
+    ``exec_cache_dir`` names a per-*request* snapshot directory: when set,
+    execution (the witness run and the extremum recompute) goes through a
+    snapshot of the alias fetched once from its true sources for this request,
+    so N obligations on one alias share one fetch per source instead of
+    re-fetching each. Structural validation and ``witness_code`` stay on the raw
+    expressions — the op-tree judged is exactly the one the certificate
+    discloses — and the snapshot fails open to the uncached path.
     """
     from pi_xorq_verifier import witness  # noqa: PLC0415
 
@@ -660,7 +669,22 @@ def discharge(
             base_alias=ob.on,
             detail=reason or "ill-formed witness",
         )
-    run = witness.run_expr(expr)
+    # Execution base: the per-request snapshot of the alias when one is
+    # available (one fetch per source per request), else the raw alias. The
+    # witness executed is re-built on that base — semantically the same
+    # expression the checks above validated.
+    exec_base = (
+        witness.snapshot_alias(alias_expr, catalog_path, exec_cache_dir)
+        if exec_cache_dir
+        else None
+    )
+    run_expr_obj = expr
+    if exec_base is not None:
+        # No `or`-fallback: an ibis expression forbids __bool__.
+        rebuilt = witness.build_witness(exec_base, ob)
+        if rebuilt is not None:
+            run_expr_obj = rebuilt
+    run = witness.run_expr(run_expr_obj)
     if run is None:
         return ObligationResult(
             ob.id,
@@ -673,7 +697,8 @@ def discharge(
     checks = checks + predicate_checks
     if ob.kind in (ClaimKind.ARGMAX, ClaimKind.ARGMIN):
         status, maximality, detail = _confirm_maximality(
-            ob, run, alias_expr, status, detail, witness
+            ob, run, exec_base if exec_base is not None else alias_expr,
+            status, detail, witness,
         )
         checks = checks + (maximality,)
     provenance = provenance_ok(ob, lineage_by_alias)
@@ -860,13 +885,30 @@ def check_obligations(
     on its own — you never need the original request to re-run the proof. The
     population lives in ``witness_code``, not a separate field.
     """
+    import shutil  # noqa: PLC0415 — keep the module import-light (pure core)
+    import tempfile  # noqa: PLC0415
+
     lineage_by_alias = tuple(
         (alias, tuple(lineage)) for alias, lineage in expressions
     )
-    raw = tuple(
-        discharge(ob, catalog_path, lineage_by_alias, catalog_witnesses, no_local_sources)
-        for ob in obligations
-    )
+    # One execution snapshot per REQUEST: every witness run (and extremum
+    # recompute) shares a single fetch per source, instead of re-fetching per
+    # obligation. Fresh for this request, deleted before the certificate
+    # returns — it can never feed a later request. Persistence is a separate
+    # phase so the slow round-trip confirmations overlap (see _persist_witnesses).
+    exec_cache_dir = tempfile.mkdtemp(prefix="pi-xorq-verify-exec-")
+    try:
+        raw = tuple(
+            discharge(
+                ob, catalog_path, lineage_by_alias, False, no_local_sources,
+                exec_cache_dir=exec_cache_dir,
+            )
+            for ob in obligations
+        )
+        if catalog_witnesses:
+            raw = _persist_witnesses(raw, obligations, catalog_path)
+    finally:
+        shutil.rmtree(exec_cache_dir, ignore_errors=True)
     results = tuple(
         evolve(
             r,
@@ -894,6 +936,44 @@ def check_obligations(
     if uncovered and verdict in (Verdict.VERIFIED, Verdict.NO_OP):
         verdict = Verdict.COULD_NOT_VERIFY
     return Certificate(verdict, results, uncovered, catalog_state=_catalog_state(catalog_path))
+
+
+def _persist_witnesses(
+    raw: tuple[ObligationResult, ...],
+    obligations: tuple[Obligation, ...],
+    catalog_path: str,
+) -> tuple[ObligationResult, ...]:
+    """Persist each DISCHARGED witness as a ``verify-<id>`` entry (ADR-0001 §4).
+
+    Runs the persistences concurrently: the compose (a git commit into the
+    catalog) is serialized inside :func:`witness.catalog_witness`, but each
+    entry's confirmation re-run — the slow, network-bound half of the
+    round-trip — overlaps with the others'. Fail-soft per witness: a failed
+    persistence drops ``witness_ref``, never the verdict.
+    """
+    from concurrent.futures import ThreadPoolExecutor  # noqa: PLC0415
+
+    from pi_xorq_verifier import witness  # noqa: PLC0415
+
+    def persist(pair: tuple[Obligation, ObligationResult]) -> ObligationResult:
+        ob, r = pair
+        if r.status is not ObligationStatus.DISCHARGED or not r.witness_code:
+            return r
+        expected_rows = len(ob.predicate.rows) if ob.kind is ClaimKind.TABLE else None
+        ref = (
+            witness.catalog_witness(
+                catalog_path, ob.on, r.witness_code, f"verify-{ob.id}",
+                r.selected_cell, ob.predicate.select, expected_rows=expected_rows,
+            )
+            or ""
+        )
+        return evolve(r, witness_ref=ref)
+
+    pairs = tuple(zip(obligations, raw))
+    if len(pairs) <= 1:
+        return tuple(persist(p) for p in pairs)
+    with ThreadPoolExecutor(max_workers=min(4, len(pairs))) as pool:
+        return tuple(pool.map(persist, pairs))
 
 
 def _covered_surfaces(ob: Obligation) -> frozenset[str]:
@@ -955,6 +1035,25 @@ def obligation_from_dict(d: dict) -> Obligation:
         value = d.get(key)
         return value if isinstance(value, str) else ""
 
+    # `requires_sources` is a LIST of source URLs. Producers (LLMs) regularly
+    # guess `true` here; tuple(True) used to surface as the impenetrable
+    # "malformed request: 'bool' object is not iterable" — reject it with an
+    # error that says what the field is and how to fix the request.
+    rs = d.get("requires_sources", ())
+    if isinstance(rs, str):
+        rs = (rs,)
+    elif not isinstance(rs, (list, tuple)):
+        raise ValueError(
+            "requires_sources must be a list of source URLs the alias's lineage "
+            f'must cover (e.g. ["https://host/data.csv"]), got {rs!r} — omit the '
+            "field entirely to skip the provenance pin (source lineage is checked "
+            "separately by the lineage checker)"
+        )
+    # Same trap for predicate.columns: a bare string would iterate as characters.
+    p_columns = p.get("columns", ())
+    if isinstance(p_columns, str):
+        p_columns = (p_columns,)
+
     return Obligation(
         id=d["id"],
         kind=kind,
@@ -969,7 +1068,7 @@ def obligation_from_dict(d: dict) -> Obligation:
             # reach the string-only op-tree checks (e.g. _is_circular's .strip()).
             entity_val=(None if p.get("entity_val") is None else str(p.get("entity_val"))),
             metric_col=p.get("metric_col"),
-            columns=tuple(p.get("columns", ())),
+            columns=tuple(p_columns),
             rows=rows,
             ordered=bool(p.get("ordered", True)),
             value_types=value_types,
@@ -977,7 +1076,7 @@ def obligation_from_dict(d: dict) -> Obligation:
         value_type=ValueType(
             kind=vt.get("kind", "int"), tolerance=str(vt.get("tolerance", "0"))
         ),
-        requires_sources=tuple(d.get("requires_sources", ())),
+        requires_sources=tuple(str(s) for s in rs),
     )
 
 

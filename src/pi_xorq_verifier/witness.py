@@ -27,6 +27,7 @@ import io
 import re
 import shutil
 import subprocess
+import threading
 from functools import cache
 from pathlib import Path
 
@@ -210,6 +211,27 @@ def _snapshot(alias_expr, catalog_path: str, cache_dir: str | None):
     return alias_expr.cache(cache=ParquetSnapshotCache.from_kwargs(base_path=str(base)))
 
 
+def snapshot_alias(alias_expr, catalog_path: str, cache_dir: str):
+    """A per-*request* execution copy of ``alias_expr``: the same expression with
+    its sources snapshot-cached under ``cache_dir``, so N witnesses on one alias
+    within a single verify request share ONE fetch per source instead of
+    re-fetching per obligation.
+
+    Distinct from the cross-turn ``select-cache`` (which *proposes* numbers and
+    never certifies them): this snapshot is created fresh for one request — the
+    data still comes from the true declared sources, fetched at request time —
+    and its directory is deleted with the request, so no stale snapshot can
+    outlive the certificate it fed. Fail-open to ``None``: the caller falls back
+    to the uncached expression, and correctness never depends on the cache.
+    """
+    if not _AVAILABLE or alias_expr is None or not cache_dir:
+        return None
+    try:
+        return _snapshot(alias_expr, catalog_path, cache_dir)
+    except Exception:
+        return None
+
+
 # --------------------------------------------------------------------------- #
 # Building the witness — synthesize the canonical query over the population.   #
 #                                                                              #
@@ -274,20 +296,23 @@ def build_error(alias_expr, ob) -> str:
     except Exception:
         cols = ()
     p = ob.predicate
-    # An ungrounded scalar is the one kind whose witness is not synthesized: it
-    # needs `expression` (the full expression). A population alone selects no
-    # cell — the split exists so a full expression can never pose as a
-    # population (or vice versa).
+    # An ungrounded scalar synthesizes when `predicate.select` names an alias
+    # column (the selection is the witness); otherwise it needs `expression`
+    # (the full expression). A population alone selects no cell — the split
+    # exists so a full expression can never pose as a population (or vice versa).
     if (
         ob.kind is ClaimKind.SCALAR
         and not ob.expression
         and not (p.entity_col and p.entity_val is not None)
+        and not (p.select and p.select in cols)
     ):
         return (
-            "an ungrounded scalar needs `expression` — the full expression whose "
-            "cell is the claimed value, e.g. source.aggregate(total=source.n.sum()) "
-            "— `population` only restricts the alias for the synthesized kinds; "
-            "or ground the value with predicate.entity_col/entity_val"
+            "an ungrounded scalar needs its cell named: set predicate.select to a "
+            f"column of the alias (columns: {cols or 'unavailable'}) and the "
+            "checker synthesizes the selection itself; or pass `expression` — the "
+            "full expression whose cell is the claimed value, e.g. "
+            "source.aggregate(total=source.n.sum()); or ground the value with "
+            "predicate.entity_col/entity_val. `population` only restricts the alias."
         )
     # The declared `population` (a restriction of the alias) must compose on
     # `source` and stay a clean restriction (no join/set/limit/arith).
@@ -426,7 +451,15 @@ def _synthesize(alias_expr, ob):
                     c for c in dict.fromkeys((p.entity_col, p.select)) if c and c in cols
                 )
                 return filtered.select(*select) if select else filtered
-            return None  # ungrounded scalar → escape hatch
+            # An ungrounded scalar that names its cell's column is synthesizable
+            # too: the canonical witness is the selection itself (the shape every
+            # producer tries first). Multi-row results stay safe — discharge
+            # fails closed on >1 distinct cell (value_unambiguous). A declared
+            # `expression` still wins the escape hatch: it may narrow the
+            # population in ways the bare selection cannot.
+            if not ob.expression and p.select and p.select in cols:
+                return pop.select(p.select)
+            return None  # ungrounded scalar with expression → escape hatch
         case ClaimKind.MEMBERSHIP:
             column = p.select or p.entity_col
             if not column or column not in cols:
@@ -837,6 +870,8 @@ def witness_code(alias_expr, ob) -> str | None:
                     f"{base}.filter(source.{p.entity_col} == {p.entity_val!r})"
                     + _select_code(sel)
                 )
+            if not ob.expression and p.select and p.select in cols:
+                return base + _select_code((p.select,))  # the synthesized selection
             return escape
         case ClaimKind.MEMBERSHIP:
             column = p.select or p.entity_col
@@ -858,14 +893,22 @@ def witness_code(alias_expr, ob) -> str | None:
             return escape
 
 
+# Catalog WRITES (compose / remove-alias) commit into the catalog's git repo;
+# two concurrent writes contend on its index.lock and one fails. Persistence
+# runs witnesses concurrently (the round-trip re-runs overlap), so the write
+# half of each round-trip is serialized here.
+_CATALOG_WRITE_LOCK = threading.Lock()
+
+
 def _remove_alias(xorq: str, catalog_path: str, alias: str) -> None:
     """Best-effort removal of an alias we created but could not confirm — so a
     failed round-trip never leaves an orphan ``verify-<id>`` in the catalog."""
     try:
-        subprocess.run(
-            (xorq, "catalog", "-p", catalog_path, "remove-alias", alias),
-            capture_output=True, text=True, timeout=WITNESS_TIMEOUT_S,
-        )
+        with _CATALOG_WRITE_LOCK:
+            subprocess.run(
+                (xorq, "catalog", "-p", catalog_path, "remove-alias", alias),
+                capture_output=True, text=True, timeout=WITNESS_TIMEOUT_S,
+            )
     except (OSError, subprocess.SubprocessError):
         pass
 
@@ -888,11 +931,19 @@ def catalog_witness(
     if not (_AVAILABLE and xorq and on and code):
         return None
     try:
-        add = subprocess.run(
-            (xorq, "catalog", "-p", catalog_path, "compose", on, "-c", code,
-             "-a", alias, "--no-sync"),
-            capture_output=True, text=True, timeout=WITNESS_TIMEOUT_S,
-        )
+        with _CATALOG_WRITE_LOCK:
+            # --use-this-venv: build the composed entry in THIS venv instead of
+            # `uv tool run` on the entries' joint bundle — the checker just
+            # loaded and executed the alias in-process, so this venv provably
+            # has every package the entry needs, and the resulting entry hash
+            # is identical. The isolated path re-built the project wheel per
+            # witness (~7s each); this is ~1s, and the round-trip below still
+            # gates what gets to keep its alias.
+            add = subprocess.run(
+                (xorq, "catalog", "-p", catalog_path, "compose", on, "-c", code,
+                 "-a", alias, "--no-sync", "--use-this-venv"),
+                capture_output=True, text=True, timeout=WITNESS_TIMEOUT_S,
+            )
     except (OSError, subprocess.SubprocessError):
         return None
     blob = add.stdout + add.stderr

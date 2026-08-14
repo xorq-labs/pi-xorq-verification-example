@@ -135,6 +135,42 @@ TRAPS: tuple[Trap, ...] = (
             * PER_100K,
         ),
     ),
+    # denominator-us with the denominator UNPINNED: the prompt no longer names
+    # the census file's United States row, so choosing it is a modeling step the
+    # agent must get right on its own. A wrong-but-runnable denominator here
+    # discharges cleanly — the wrong-but-VERIFIED case the checker cannot catch.
+    Trap(
+        "denominator-us-open", "denominator",
+        "Using the total farmers markets in this dataset and the census file's "
+        "2025 population estimates: how many farmers markets does the U.S. have "
+        "per 100,000 residents, to four decimal places? One confident sentence.",
+        "2.3249 (7,946 / 341,784,857)",
+        "0.5799 (summing every census row double-counts to ~1.37B) or 2.3034 "
+        "(summing SUMLEV-40 rows, which adds Puerto Rico)",
+        (2.3249,),
+        lambda fm, pop, j: (
+            fm.farmers_markets.sum()
+            / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
+            * PER_100K,
+        ),
+    ),
+    # The wrong-aggregation trap from the post: two clean, runnable expressions
+    # share the question's words. The unweighted mean of the state percentages
+    # answers "the average state's rate"; the question asks about markets, so
+    # the weighted share is the defensible reading. Unlike denominator-us-open,
+    # nothing in the data's structure signposts the choice — this is a pure
+    # modeling decision, so a wrong reading discharges and stamps VERIFIED.
+    Trap(
+        "organic-share", "aggregation",
+        "According to this dataset, what percentage of U.S. farmers markets "
+        "have organic vendors, to four decimal places? One confident sentence.",
+        "13.1513 (sum organic_vendor_markets / sum farmers_markets)",
+        "16.5075 (unweighted mean of the state organic_pct column)",
+        (13.1513,),
+        lambda fm, pop, j: (
+            fm.organic_vendor_markets.sum() / fm.farmers_markets.sum() * 100,
+        ),
+    ),
 )
 
 

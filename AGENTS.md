@@ -75,8 +75,11 @@ never pad a pre-rounded column with zeros.
    extremum and refuses anything else. For a scoped superlative/count put the
    population in `population` as a plain restriction of the alias — chained
    filters only (`source.filter(a).filter(b)`; no `&`/`|`, joins, or limits).
-   Only an ungrounded scalar takes `expression` (the full expression whose
-   cell is the value). For a table/ranking, declare ONE `table` obligation
+   An ungrounded scalar whose value is a bare cell of the alias needs only
+   `predicate.select` — the checker synthesizes the selection; give it
+   `expression` (the full expression whose cell is the value, e.g.
+   `source.aggregate(total=source.n.sum())`) only when the cell must be
+   computed. For a table/ranking, declare ONE `table` obligation
    covering every row and column you print (`predicate.columns`,
    `predicate.rows`, `ordered`, per-column `value_types`) — never cherry-pick
    a few cells.

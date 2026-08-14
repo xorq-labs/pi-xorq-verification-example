@@ -115,6 +115,11 @@
               pkgs.uv
               # duel.sh drives the three panes with tmux
               pkgs.tmux
+              # record.sh captures a cast of the duel; agg renders it to a gif,
+              # gifsicle requantizes that gif down to README weight
+              pkgs.asciinema
+              pkgs.asciinema-agg
+              pkgs.gifsicle
               # Shadow Apple's /usr/bin/git shim: with DEVELOPER_DIR pointing into
               # the nix apple-sdk it warns "unhandled Platform key FamilyDisplayName"
               # on every invocation (3x per xorq catalog command, which shells to git).
@@ -127,6 +132,15 @@
             };
             shellHook = ''
               unset PYTHONPATH
+              # Apple's /usr/bin xcrun shims (git among them) warn "unhandled
+              # Platform key FamilyDisplayName" whenever DEVELOPER_DIR/SDKROOT
+              # point into the nix apple-sdk — and a login subshell (pi's bash
+              # tool) lets macOS path_helper put /usr/bin back ahead of the nix
+              # git above, so every `xorq catalog` call dumped three warning
+              # lines into the agent's context. Nothing in this shell compiles
+              # at runtime; drop the SDK pins so the shims stay quiet wherever
+              # PATH resolution lands.
+              unset DEVELOPER_DIR SDKROOT
               export REPO_ROOT=$(git rev-parse --show-toplevel)
             '';
           };

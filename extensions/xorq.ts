@@ -433,10 +433,12 @@ export default function (pi: ExtensionAPI) {
       "Run the deterministic checker over a set of DECLARED expressions and " +
       "OBLIGATIONS and return one re-checkable certificate. Each obligation is " +
       "{id, kind, surface, on, population?, predicate, value_type, " +
-      "requires_sources} — you declare the witness SITE (`on` = a declared alias, " +
+      "requires_sources?} — you declare the witness SITE (`on` = a declared alias, " +
       "`population` = a plain filter restricting it); the checker synthesizes and " +
-      "re-runs the witness itself. Only an ungrounded scalar passes `expression` " +
-      "(its full expression). Verify a TABLE/RANKING as one `kind:table` obligation " +
+      "re-runs the witness itself. An ungrounded scalar whose value is a bare cell " +
+      "of the alias needs only predicate.select (the checker synthesizes the " +
+      "selection); pass `expression` (its full expression) only when the cell must " +
+      "be computed. Verify a TABLE/RANKING as one `kind:table` obligation " +
       "(predicate.columns/rows/ordered/metric_col, population in `population`) so every cell and the " +
       "ordering are checked — do not cherry-pick scalars from a table. Put EVERY " +
       "number you will print in `reply_values` (uncovered values downgrade to " +
@@ -456,7 +458,52 @@ export default function (pi: ExtensionAPI) {
         {
           catalog_path: Type.String(),
           expressions: Type.Optional(Type.Array(Type.Any())),
-          obligations: Type.Array(Type.Any()),
+          // Typed to match schemas/request.schema.json — an untyped Any here
+          // let the model invent shapes (requires_sources: true was guessed in
+          // nearly every run and died as an opaque parse error downstream).
+          obligations: Type.Array(
+            Type.Object(
+              {
+                id: Type.String(),
+                kind: Type.Union([
+                  Type.Literal("scalar"),
+                  Type.Literal("argmax"),
+                  Type.Literal("argmin"),
+                  Type.Literal("count"),
+                  Type.Literal("membership"),
+                  Type.Literal("table"),
+                ]),
+                surface: Type.Optional(
+                  Type.String({
+                    description:
+                      "The claimed value verbatim as written in the answer. Required for the value kinds; optional for a table (its content is predicate.rows).",
+                  }),
+                ),
+                on: Type.String({ description: "A DECLARED alias the witness is composed on." }),
+                population: Type.Optional(
+                  Type.String({
+                    description:
+                      "Restriction of the alias the witness ranges over — chained filters only (source.filter(a).filter(b)); empty = the whole alias.",
+                  }),
+                ),
+                expression: Type.Optional(
+                  Type.String({
+                    description:
+                      "Ungrounded scalar ONLY, and only when the cell must be computed (e.g. source.aggregate(total=source.n.sum())). A bare cell of the alias needs only predicate.select.",
+                  }),
+                ),
+                predicate: Type.Object({}, { additionalProperties: true }),
+                value_type: Type.Optional(Type.Object({}, { additionalProperties: true })),
+                requires_sources: Type.Optional(
+                  Type.Array(Type.String(), {
+                    description:
+                      "Source URLs the witness alias's lineage must cover — a LIST of URL strings, never a boolean. Omit to skip the provenance pin (use xorq_check_lineage for source checks).",
+                  }),
+                ),
+              },
+              { additionalProperties: true },
+            ),
+          ),
           reply_values: Type.Optional(Type.Array(Type.String())),
           catalog_witnesses: Type.Optional(
             Type.Boolean({

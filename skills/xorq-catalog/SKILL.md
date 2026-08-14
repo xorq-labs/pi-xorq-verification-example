@@ -21,6 +21,11 @@ xorq catalog -p .xorq/catalog list-aliases   # what's available
 xorq catalog -p .xorq/catalog info           # entry/alias counts, remotes
 ```
 
+`info` succeeding means the catalog exists — do **not** run `init` on it, not
+even defensively (`init` on an existing catalog just errors, and the noise reads
+as a failure). The catalog is normally created before you start; `init` only
+when `info` itself fails.
+
 ## Inspect a source — through the catalog, never `curl`
 
 Do **not** `curl | head/tail/wc` a source to learn its shape: every such call
@@ -120,7 +125,13 @@ xorq catalog -p .xorq/catalog add "$(cat /tmp/bp.txt)" -a orders --no-sync
 xorq catalog -p .xorq/catalog list-aliases                 # confirm: orders
 ```
 
-Two mechanical rules, both from real failed runs:
+Three mechanical rules, all from real failed runs:
+
+- **Run catalog writes (`add`/`compose`/`remove-alias`) one at a time, never as
+  parallel tool calls.** Every write commits into the catalog's git repo; two in
+  flight contend on its `index.lock` and one fails (`Lock … could not be
+  obtained`). If you hit that error, just re-run the failed command — do not
+  delete the lock file.
 
 - **Run `xorq build` and `catalog add` from the same directory** (the repo root,
   as above — no `cd`). The emitted build path is *relative to where `xorq build`
