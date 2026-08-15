@@ -31,6 +31,8 @@ import {
   foldCertificate,
   gateBanner,
   gbacked,
+  statedRefuted,
+  statedUncovered,
   type CertFold,
 } from "./lib/gate.ts";
 
@@ -202,7 +204,19 @@ const certComponent = (cert: any) => ({ render: (width: number) => certLines(cer
 function certText(cert: any): string {
   // The same card the TUI draws, as plain text (no ANSI) — this is the tool
   // result content, so external viewers and the model get the full certificate.
-  return stripAnsi(certLines(cert, 200).join("\n"));
+  const base = stripAnsi(certLines(cert, 200).join("\n"));
+  // The answer contract, stated BEFORE the answer is written (the observed
+  // failure: a discharged headline value shipped alongside undischarged
+  // supporting figures — "from 7,942 markets and 341,784,857 residents" —
+  // and the gate rightly stamped NOT VERIFIED, but only after the fact).
+  const vals = [...new Set(dischargedValues(cert))];
+  if (!vals.length) return base;
+  return (
+    base +
+    `\nanswer contract: every figure in the final answer must be discharged — ` +
+    `this certificate covers: ${vals.join(", ")}. A supporting number you did ` +
+    `not verify (totals, populations) must be verified too or left out.`
+  );
 }
 
 // Render a source-lineage verdict ({verdict, alias, sources, upstream_entries,
@@ -862,8 +876,11 @@ export default function (pi: ExtensionAPI) {
         catalogState: _cat,
         unbacked,
         lineageFails,
-        refuted: _fold.refuted,
-        uncoveredCert: _fold.uncovered,
+        // Standing refutations / coverage gaps refuse only the answer that
+        // STATES them (numeric surfaces; text refutations stand regardless) —
+        // a typo'd, abandoned obligation must not condemn a backed answer.
+        refuted: statedRefuted(_fold.refuted, claims, answer),
+        uncoveredCert: statedUncovered(_fold.uncovered, claims, answer),
         lineageChecked: _lineageMap.size > 0,
         superlatives,
         hasExtremal: _extremal,

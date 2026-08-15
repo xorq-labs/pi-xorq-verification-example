@@ -145,6 +145,8 @@ export function answerClaims(text: string): Claim[] {
     const bare = raw.replace(/,/g, "").replace(/%/g, "");
     if (/^\d{4}$/.test(bare) && n >= 1900 && n <= 2099) continue; // year
     if (/per\s*$/i.test(cleaned.slice(Math.max(0, m.index - 5), m.index))) continue; // "per 100,000"
+    // Scope idiom, not a data claim: "the 50 states", "50 U.S. states + DC".
+    if (/^\s+(?:U\.?S\.?\s+)?states\b/i.test(cleaned.slice(m.index + raw.length))) continue;
     const dot = bare.indexOf(".");
     const dec = dot < 0 ? 0 : bare.length - dot - 1;
     const hasPct = raw.includes("%");
@@ -196,6 +198,34 @@ export const gbacked = (c: Claim, blessed: number[]): boolean => {
     (b) => Math.abs(c.n - b) <= tol || (c.pct && Math.abs(c.n / 100 - b) <= fracTol),
   );
 };
+
+// Scope STANDING refutations to the answer that states them: a numeric surface
+// the final answer never claims (a typo'd obligation the agent abandoned, e.g.
+// 8395 refuted then the correct 7942 discharged) must not condemn an otherwise
+// fully-backed answer — the sanctioned repair is to discharge the right figure
+// and not print the wrong one. TEXT surfaces stay unconditional: a refuted
+// entity/category often appears in prose in wording the numeric net cannot
+// match, which is exactly why refutations are status-based at all.
+export function statedRefuted(refuted: string[], claims: Claim[], answer: string): string[] {
+  return refuted.filter((key) => {
+    const n = Number(key);
+    if (!Number.isFinite(n)) return true; // text surface: stands regardless
+    return claims.some((c) => gbacked(c, [n]));
+  });
+}
+
+// Same scoping for standing coverage gaps (reply values no certificate covered):
+// numeric ones matter only if the answer states them; text ones only if the
+// answer contains them — an undischarged value the answer never printed is not
+// a claim to refuse.
+export function statedUncovered(uncovered: string[], claims: Claim[], answer: string): string[] {
+  const lower = answer.toLowerCase();
+  return uncovered.filter((key) => {
+    const n = Number(key);
+    if (Number.isFinite(n)) return claims.some((c) => gbacked(c, [n]));
+    return lower.includes(key.toLowerCase());
+  });
+}
 
 // A one-line reason for a lineage that failed its source check (from
 // xorq_check_lineage): the alias and why. `lineageFails` are the tracked

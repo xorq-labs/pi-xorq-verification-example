@@ -227,3 +227,48 @@ test("claim extraction skips years, per-capita denominators, small ordinals", ()
   ).map((c) => c.n);
   assert.deepEqual(ns, [0.2948]);
 });
+
+// ---------------------------------------------------------------------------
+// Answer-scoped standing refutations / coverage gaps (the 2026-08-15 bench
+// run pi-08: a typo'd obligation surface 8395 was REFUTED, the correct 7942
+// then DISCHARGED — yet the banner refused an answer that never stated 8395).
+// ---------------------------------------------------------------------------
+import { statedRefuted, statedUncovered } from "../../extensions/lib/gate.ts";
+
+test("an unstated numeric refutation does not stand against the answer", () => {
+  const answer = "The U.S. has 2.3237 farmers markets per 100,000 residents.";
+  const claims = answerClaims(answer);
+  assert.deepEqual(statedRefuted(["8395"], claims, answer), []);
+});
+
+test("a stated numeric refutation still refuses", () => {
+  const answer = "There are 8395 farmers markets.";
+  const claims = answerClaims(answer);
+  assert.deepEqual(statedRefuted(["8395"], claims, answer), ["8395"]);
+});
+
+test("a text refutation stands regardless of the prose", () => {
+  const answer = "The busiest origin is ORD.";
+  assert.deepEqual(statedRefuted(["atl"], answerClaims(answer), answer), ["atl"]);
+});
+
+test("uncovered values matter only when the answer states them", () => {
+  const answer = "The rate is 2.3237 (see verify-rate).";
+  const claims = answerClaims(answer);
+  assert.deepEqual(statedUncovered(["7942", "ATL"], claims, answer), []);
+  const answer2 = "The rate is 2.3237, from 7942 markets at ATL.";
+  const claims2 = answerClaims(answer2);
+  assert.deepEqual(statedUncovered(["7942", "ATL"], claims2, answer2), ["7942", "ATL"]);
+});
+
+test("'the 50 states' scope idiom is not a data claim", () => {
+  const claims = answerClaims(
+    "Across the 50 states and DC, the U.S. has 2.3237 markets per 100,000 residents (50 U.S. states).",
+  );
+  assert.deepEqual(claims.map((c) => c.n), [2.3237]);
+});
+
+test("a bare count before other nouns is still a claim", () => {
+  const claims = answerClaims("There are 50 markets in Vermont.");
+  assert.deepEqual(claims.map((c) => c.n), [50]);
+});

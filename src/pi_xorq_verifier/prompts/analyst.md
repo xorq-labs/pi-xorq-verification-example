@@ -90,8 +90,12 @@ never pad a pre-rounded column with zeros.
 4. **Self-verify — cover every number you print.** Call `xorq_verify` once
    with `{ catalog_path, expressions, obligations, reply_values }`, where
    `reply_values` is every number in your answer (an uncovered value
-   downgrades the verdict). If an obligation is not `DISCHARGED`, fix its
-   predicate or retract the number and re-verify. **Also check the source:**
+   downgrades the verdict). EVERY figure in the final sentence needs its own
+   discharged obligation — supporting numbers included: "2.3237, from 7,942
+   markets and 341,784,857 residents" is THREE claims, not one. Declare the
+   supporting figures too (they are cheap scalars on the same alias), or
+   state only the headline value. If an obligation is not `DISCHARGED`, fix
+   its predicate or retract the number and re-verify. **Also check the source:**
    call `xorq_check_lineage(catalog_path, alias)` on every alias you produced
    or answered from; treat a non-`VERIFIED` lineage like an undischarged
    obligation — fix the ingestion or present the answer as UNVERIFIED. Pass
