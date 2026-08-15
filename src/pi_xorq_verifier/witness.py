@@ -192,11 +192,20 @@ def cached_select(
             "declare it first (see xorq_catalog_list_aliases)"
         )
     source = _snapshot(alias_expr, catalog_path, cache_dir) if use_cache else alias_expr
-    expr = _eval_code(normalize_compose(compose), source)
-    if limit > 0 and not _HAS_LIMIT.search(compose):
-        expr = expr.limit(limit)
-    buf = io.StringIO()
-    expr.execute().to_csv(buf, index=False, quoting=csv.QUOTE_NONNUMERIC)
+    try:
+        expr = _eval_code(normalize_compose(compose), source)
+        if limit > 0 and not _HAS_LIMIT.search(compose):
+            expr = expr.limit(limit)
+        buf = io.StringIO()
+        expr.execute().to_csv(buf, index=False, quoting=csv.QUOTE_NONNUMERIC)
+    except Exception as exc:
+        # A failed compose on a semantic-model alias almost always means the
+        # measure was treated as a column — re-raise with the by-name pattern
+        # attached so the analyst self-corrects instead of abandoning the model.
+        hint = _semantic_select_hint(alias_expr, compose)
+        if hint:
+            raise ValueError(f"{type(exc).__name__}: {exc}\n{hint}") from exc
+        raise
     return buf.getvalue()
 
 
@@ -280,6 +289,89 @@ def build_witness(alias_expr, ob):
         return None
 
 
+def check_hint(alias_expr, ob, checks) -> str:
+    """A targeted remedy for a witness that BUILT but failed validation — the
+    analogue of :func:`build_error` one step later, so a fixable declaration
+    self-explains instead of dead-ending at a bare "ill-formed witness" (the
+    observed failure mode: an analyst on a semantic-model alias retries
+    hand-written arithmetic blindly, never told the by-name pattern).
+    Returns "" when no named remedy applies. Never raises."""
+    try:
+        failed = {name for name, ok in checks if not ok}
+        if "selection_only" not in failed:
+            return ""
+        measures = _bsl_measure_names(alias_expr)
+        if measures:
+            return (
+                "the witness adds arithmetic on top of the alias, but this alias "
+                "is a SEMANTIC MODEL — its reviewed measures are the only "
+                f"sanctioned computations (measures: {', '.join(measures)}). "
+                "Declare the measure BY NAME instead — no `expression` at all: "
+                'predicate = {"measures": ["<measure>"], "select": "<measure>"} '
+                "and the checker synthesizes the reviewed query itself."
+            )
+        return (
+            "the witness computes (arithmetic) rather than selects; select a "
+            "cell the alias already holds, or catalog the metric as its own "
+            "entry (a build script over the sources) and declare on that alias"
+        )
+    except Exception:
+        return ""
+
+
+def _bsl_measure_names(alias_expr) -> tuple[str, ...]:
+    """The alias's BSL semantic-model measure names, or () when it carries no
+    model (or BSL is not installed). Never raises."""
+    if alias_expr is None:
+        return ()
+    try:
+        return tuple(alias_expr.ls.builder.measures)
+    except Exception:
+        return ()
+
+
+def _semantic_query(alias_expr, p):
+    """The reviewed semantic-model query the predicate declares: measures (and
+    optional dimensions) BY NAME over the alias's own BSL model. ``None`` when
+    the alias carries no model or a name is not declared by it — fail closed,
+    never a guess."""
+    try:
+        from boring_semantic_layer import to_tagged  # noqa: PLC0415
+
+        builder = alias_expr.ls.builder
+        if not p.measures or not set(p.measures) <= set(builder.measures):
+            return None
+        if p.dimensions and not set(p.dimensions) <= set(builder.dimensions):
+            return None
+        q = (
+            builder.query(dimensions=list(p.dimensions), measures=list(p.measures))
+            if p.dimensions
+            else builder.query(measures=list(p.measures))
+        )
+        return to_tagged(q)
+    except Exception:
+        return None
+
+
+def _semantic_select_hint(alias_expr, compose: str) -> str:
+    """When a compose fails on a semantic-model alias, point at the by-name
+    query pattern. The failures analysts actually hit: treating a measure as a
+    column (``source.select('<measure>')`` / ``source.<measure>``) or chaining
+    further ops onto the query result. Empty for plain aliases. Never raises."""
+    measures = _bsl_measure_names(alias_expr)
+    if not measures:
+        return ""
+    named = [m for m in measures if m in compose]
+    example = (named or measures)[-1]
+    return (
+        "hint: this alias is a SEMANTIC MODEL — measures are not columns of "
+        f"`source` (measures: {', '.join(measures)}). Read them by name with the "
+        f"xorq_semantic_select tool (measures=['{example}']), or compose "
+        f"source.ls.builder.query(measures=['{example}']).to_tagged() with "
+        "nothing chained after."
+    )
+
+
 def build_error(alias_expr, ob) -> str:
     """A specific reason a witness would not build, for the ``COULD-NOT-DISCHARGE``
     detail — so a malformed obligation self-explains instead of dead-ending at a
@@ -296,6 +388,30 @@ def build_error(alias_expr, ob) -> str:
     except Exception:
         cols = ()
     p = ob.predicate
+    # Semantic-model claims (predicate.measures) self-explain first: the two
+    # malformations are a name the model does not declare, and a `population`
+    # restriction (which would silently re-scope the reviewed definition).
+    if ob.kind is ClaimKind.SCALAR and p.measures:
+        if ob.population:
+            return (
+                "a semantic-model claim (predicate.measures) ranges over the "
+                "WHOLE model — drop `population`; a restriction would re-scope "
+                "the reviewed definition"
+            )
+        model_measures = _bsl_measure_names(alias_expr)
+        if not model_measures:
+            return (
+                f"predicate.measures declared, but alias {ob.on!r} carries no "
+                "BSL semantic model — declare on a semantic-model alias "
+                "(xorq_semantic_models lists them)"
+            )
+        unknown = tuple(m for m in p.measures if m not in model_measures)
+        if unknown:
+            return (
+                f"measures {unknown} are not declared by this model — its "
+                f"measures are: {', '.join(model_measures)}"
+            )
+        return ""
     # An ungrounded scalar synthesizes when `predicate.select` names an alias
     # column (the selection is the witness); otherwise it needs `expression`
     # (the full expression). A population alone selects no cell — the split
@@ -445,6 +561,24 @@ def _synthesize(alias_expr, ob):
             name = p.select or "n"
             return pop.aggregate(**{name: pop.count()})
         case ClaimKind.SCALAR:
+            # Semantic-model claim: measures (and optional dimensions) BY NAME
+            # from the alias's own BSL model. The checker synthesizes the
+            # reviewed query itself — the producer never writes the expression.
+            # It ranges over the WHOLE model: a `population` restriction would
+            # silently re-scope the reviewed definition, so it fails closed.
+            if p.measures:
+                if ob.population:
+                    return None
+                q = _semantic_query(alias_expr, p)
+                if q is None:
+                    return None
+                qcols = q.columns
+                if p.entity_col and p.entity_val is not None and p.entity_col in qcols:
+                    q = q.filter(q[p.entity_col] == p.entity_val)
+                select = tuple(
+                    c for c in dict.fromkeys((p.entity_col, p.select)) if c and c in qcols
+                )
+                return q.select(*select) if select else q
             if p.entity_col and p.entity_val is not None and p.entity_col in cols:
                 filtered = pop.filter(pop[p.entity_col] == p.entity_val)
                 select = tuple(
@@ -648,8 +782,44 @@ def _has_arithmetic(expr, alias_expr=None) -> bool:
     with a computed column) is **excluded**: selecting a cell from a computed
     alias is still selection — the alias is a declared, provenance-tracked
     expression, and re-flagging its upstream math made every derived metric
-    unverifiable. Only arithmetic the witness adds *on top of* the alias counts."""
-    return _adds(expr, alias_expr, _ops.NumericBinary)
+    unverifiable. Only arithmetic the witness adds *on top of* the alias counts.
+
+    A BSL semantic model's measures are the same case one expansion later: the
+    arithmetic lives in the alias's own tag metadata (reviewed, cataloged) and
+    only materializes when a witness queries the measure by name, so those
+    nodes are folded into the alias's base too — querying a reviewed measure
+    is selection, not computation."""
+    base = _bsl_measure_nodes(alias_expr, _ops.NumericBinary)
+    if not base:
+        return _adds(expr, alias_expr, _ops.NumericBinary)
+    base |= (
+        frozenset(walk_nodes(_ops.NumericBinary, alias_expr))
+        if alias_expr is not None
+        else frozenset()
+    )
+    return any(n not in base for n in walk_nodes(_ops.NumericBinary, expr))
+
+
+def _bsl_measure_nodes(alias_expr, types) -> frozenset:
+    """Nodes of ``types`` contributed by the alias's OWN tag-declared BSL
+    measures. Each measure is expanded exactly as a witness's
+    ``source.ls.builder.query(measures=[name])`` would expand it, so a witness
+    that invokes measures by name adds nothing beyond this set — while
+    arithmetic that matches no declared measure still fails ``selection_only``.
+    Fails soft (empty set): no tag, no builder, or no BSL installed simply
+    means no exemption."""
+    if alias_expr is None:
+        return frozenset()
+    try:
+        from boring_semantic_layer import to_tagged  # noqa: PLC0415
+
+        builder = alias_expr.ls.builder
+        nodes: set = set()
+        for measure in list(builder.measures):
+            nodes |= set(walk_nodes(types, to_tagged(builder.query(measures=[measure]))))
+        return frozenset(nodes)
+    except Exception:
+        return frozenset()
 
 
 def _is_circular(expr, ob) -> bool:
@@ -862,6 +1032,14 @@ def witness_code(alias_expr, ob) -> str | None:
             name = p.select or "n"
             return f"{base}.aggregate({name}=xo._.count())"
         case ClaimKind.SCALAR:
+            if p.measures:
+                if ob.population or (p.entity_col and p.entity_val is not None):
+                    # a grounded semantic claim has no one-line compose form yet
+                    return None
+                dims = f"dimensions={list(p.dimensions)!r}, " if p.dimensions else ""
+                code = f"source.ls.builder.query({dims}measures={list(p.measures)!r}).to_tagged()"
+                sel = (p.select,) if p.select and p.select in p.measures + p.dimensions else ()
+                return code + _select_code(sel) if sel else code
             if p.entity_col and p.entity_val is not None and p.entity_col in cols:
                 sel = tuple(
                     c for c in dict.fromkeys((p.entity_col, p.select)) if c and c in cols
