@@ -62,10 +62,11 @@ fi
 
 # The prompt is baited so a wrong answer is provable against the cited sources.
 # Pick a trap by id; ids and oracles live in bench/hallucination_prompts.py.
-# The default is a cross-dataset ratio (markets total ÷ census US population):
-# it needs both files ingested and the metric composed as an expression, so the
-# whole verification pipeline is exercised — and the denominator has two
-# tempting wrong readings that a bare agent falls into in provable ways.
+# The default is a cross-dataset ratio (states+DC markets total ÷ census
+# US-row population — territories excluded on both sides): it needs both files
+# ingested and the metric composed as an expression, so the whole verification
+# pipeline is exercised — and each side of the ratio has tempting wrong
+# readings that a bare agent falls into in provable ways.
 TRAP_ID="${TRAP_ID_ARG:-denominator-us}"
 if ! PROMPT="$(python bench/hallucination_prompts.py --duel "$TRAP_ID")"; then
   printf '%s\n' "$PROMPT" >&2  # on an unknown id, bench prints the valid ids

@@ -48,28 +48,32 @@ MODEL_PI = "anthropic/claude-haiku-4-5"
 # prompt pins it; `baits` are the trap's NAMED wrong readings (attributable
 # failure modes), checked only when `right` is absent.
 SCORING = {
+    # The two-value alternations pair either numerator (7,942 states+DC or
+    # 7,944 with territories) with the same wrong denominator.
     "denominator-us": {
-        "right": r"2\.3249",
+        "right": r"2\.3237",
         "baits": {
-            "double-count-all-rows (0.5799)": r"0\.5799",
-            "sumlev40-adds-PR (2.3034)": r"2\.3034",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
+            "territories-in-numerator (2.3243)": r"2\.3243",
         },
     },
     "national-sum": {
-        "right": r"\b7,?946\b",
+        "right": r"\b7,?944\b",
         "baits": {"memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b"},
     },
     # The unpinned variant scores identically — the oracle doesn't move just
     # because the prompt stopped naming it.
     "denominator-us-open": {
-        "right": r"2\.3249",
+        "right": r"2\.3237",
         "baits": {
-            "double-count-all-rows (0.5799)": r"0\.5799",
-            "sumlev40-adds-PR (2.3034)": r"2\.3034",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
+            "territories-in-numerator (2.3243)": r"2\.3243",
         },
     },
     "organic-share": {
-        "right": r"13\.1513",
+        "right": r"13\.1546",
         "baits": {"unweighted-state-mean (16.5075)": r"16\.5075"},
     },
 }

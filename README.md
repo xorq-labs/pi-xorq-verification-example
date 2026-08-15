@@ -121,12 +121,14 @@ defensible answer and it is recomputable. A wrong answer is *provably*
 hallucinated, not merely disputed.
 
 - **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents.
-  A cross-dataset ratio with three tempting denominators: the census file's
-  United States row (right: 2.3249), the sum of every census row (double-counts
-  regions to ~1.37B → 0.5799), or the sum of the state rows (silently adds
-  Puerto Rico → 2.3034).
+  A cross-dataset ratio over matched scopes: the prompt excludes the dataset's
+  territory rows (Puerto Rico, Virgin Islands) from the market total so it
+  covers exactly what the census United States row covers (states + DC; right:
+  2.3237). The tempting wrong readings: leave the territories in the numerator
+  (2.3243), sum every census row (double-counts regions to ~1.37B → 0.5796),
+  or use a SUMLEV-40 denominator (adds Puerto Rico back → 2.3022).
 - **`national-sum`** — the dataset's total number of farmers markets. The file
-  sums to 7,946, but the real-world USDA figure (~8,600–8,700) saturates the
+  sums to 7,944, but the real-world USDA figure (~8,600–8,700) saturates the
   training data — the bait is answering from memory instead of from the rows.
 
 ## What to watch for
