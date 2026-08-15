@@ -48,19 +48,22 @@ MODEL_PI = "anthropic/claude-haiku-4-5"
 # prompt pins it; `baits` are the trap's NAMED wrong readings (attributable
 # failure modes), checked only when `right` is absent.
 SCORING = {
-    # The two-value alternations pair either numerator (7,942 states+DC or
-    # 7,944 with territories) with the same wrong denominator.
+    # The two-value alternations pair either numerator (7,942 territories
+    # excluded, or 7,944 whole-file) with the same wrong denominator.
     "denominator-us": {
         "right": r"2\.3237",
         "baits": {
+            "territories-in-numerator (2.3243)": r"2\.3243",
             "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
             "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
-            "territories-in-numerator (2.3243)": r"2\.3243",
         },
     },
     "national-sum": {
-        "right": r"\b7,?944\b",
-        "baits": {"memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b"},
+        "right": r"\b7,?942\b",
+        "baits": {
+            "memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b",
+            "whole-file-total (7,944)": r"\b7,?944\b",
+        },
     },
 }
 

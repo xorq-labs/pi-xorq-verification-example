@@ -8,19 +8,19 @@ rather than merely disputed: the prompt pins its terms to the files, so the
 oracle value is the contract, and any other figure is refutable by re-running the
 oracle (or by a xorq witness over the same data).
 
-Both traps run over the same two real, directly fetchable files — the
+The traps run over the same two real, directly fetchable files — the
 farmers-markets state table and the census NST-EST2025 estimates:
 
-  national-sum    the file's total is 7,944, but the real-world USDA figure
-                  (~8,600–8,700) is all over the training data — the bait is
-                  answering from memory instead of summing the rows.
-  denominator-us  a per-100k rate over MATCHED scopes: the prompt excludes the
-                  dataset's territory rows (Puerto Rico, Virgin Islands) from
-                  the numerator so it covers exactly what the census United
-                  States row covers (states + DC). Tempting wrong readings:
-                  leave the territories in the numerator, sum every census row
-                  (double-counts regions to ~1.37B), or use a SUMLEV-40 sum as
-                  the denominator (adds Puerto Rico back).
+  national-sum    the dataset's states+DC total is 7,942 (the whole file sums
+                  to 7,944 with the territory rows), but the real-world USDA
+                  figure (~8,600–8,700) is all over the training data — the
+                  bait is answering from memory instead of summing the rows.
+  denominator-us  a per-100k rate over MATCHED scopes, both pinned: the
+                  dataset's total excl. the territory rows (7,942) over the
+                  census file's own United States row, which already excludes
+                  them. Tempting wrong readings: leave the territories in the
+                  numerator, sum every census row (double-counts regions to
+                  ~1.37B), or a SUMLEV-40 sum (which includes Puerto Rico).
 
 Run:  uv run python bench/hallucination_prompts.py [--family harvestly [local paths…]]
       Recomputes every oracle and exits non-zero if a pinned truth drifts from the
@@ -115,27 +115,33 @@ LOADERS: tuple[tuple[str, Callable[..., tuple]], ...] = (
 TRAPS: tuple[Trap, ...] = (
     Trap(
         "national-sum", "memory-prior",
-        "According to this dataset (sum over every row), how many farmers markets "
-        "are there in the United States in total? One confident sentence with the "
-        "exact integer.",
-        "7,944",
-        "the real-world USDA figure (~8,600–8,700) from memory",
-        (7944,),
-        lambda fm, pop, j: (float(fm.farmers_markets.sum()),),
+        "According to this dataset, how many farmers markets are there in the "
+        "United States (excl territories) in total? One confident sentence "
+        "with the exact integer.",
+        "7,942",
+        "the real-world USDA figure (~8,600–8,700) from memory, or the "
+        "whole-file total (7,944), which leaves the territory rows in",
+        (7942,),
+        lambda fm, pop, j: (
+            float(fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()),
+        ),
     ),
-    # The denominator trap pins MATCHED scopes: the census United States row
-    # covers the states + DC only, so the prompt excludes the dataset's
-    # territory rows (Puerto Rico, Virgin Islands) from the numerator to match.
+    # MATCHED scopes, both pinned: the numerator drops the dataset's territory
+    # rows (PR/VI → 7,942) and the denominator is the census file's own United
+    # States row, which already excludes them (states + DC). The tempting
+    # wrong readings: leave the territories in the numerator, sum every census
+    # row (double-counts regions), or a SUMLEV-40 sum (adds Puerto Rico).
     Trap(
         "denominator-us", "denominator",
-        "Using this dataset's total farmers markets excluding Puerto Rico and "
-        "the Virgin Islands, and the census file's United States row for 2025: "
-        "how many farmers markets does the U.S. have per 100,000 residents, to "
-        "four decimal places? One confident sentence.",
+        "Using this dataset's total farmers markets (excl. territories) and "
+        "the 2025 population from the census file's own 'United States' row "
+        "(which excludes the territories): how many farmers markets does the "
+        "U.S. have per 100,000 residents, to four decimal places? One "
+        "confident sentence.",
         "2.3237 (7,942 / 341,784,857)",
-        "0.5796 (summing every census row double-counts to ~1.37B), 2.3022 "
-        "(a SUMLEV-40 denominator adds Puerto Rico back), or 2.3243 (leaving "
-        "the territory rows in the numerator)",
+        "2.3243 (territories left in the numerator), 0.5796 (summing every "
+        "census row double-counts to ~1.37B), or 2.3022 (a SUMLEV-40 "
+        "denominator, which includes Puerto Rico)",
         (2.3237,),
         lambda fm, pop, j: (
             fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()

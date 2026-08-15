@@ -114,22 +114,24 @@ gifsicle -O3 --lossy=90 --colors 48 demo.gif -o demo-small.gif
 
 ## What the prompts are
 
-Both prompts in `bench/hallucination_prompts.py` are **traps with an executable
+The prompts in `bench/hallucination_prompts.py` are **traps with an executable
 oracle**: each pins its terms to two real public data files (a farmers-markets
 state table and the census NST-EST2025 estimates), so there is exactly one
 defensible answer and it is recomputable. A wrong answer is *provably*
 hallucinated, not merely disputed.
 
-- **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents.
-  A cross-dataset ratio over matched scopes: the prompt excludes the dataset's
-  territory rows (Puerto Rico, Virgin Islands) from the market total so it
-  covers exactly what the census United States row covers (states + DC; right:
-  2.3237). The tempting wrong readings: leave the territories in the numerator
-  (2.3243), sum every census row (double-counts regions to ~1.37B → 0.5796),
-  or use a SUMLEV-40 denominator (adds Puerto Rico back → 2.3022).
-- **`national-sum`** — the dataset's total number of farmers markets. The file
-  sums to 7,944, but the real-world USDA figure (~8,600–8,700) saturates the
-  training data — the bait is answering from memory instead of from the rows.
+- **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents
+  over matched scopes, both terms pinned: the dataset's total excluding the
+  territory rows (7,942) over the census file's own United States row, which
+  already excludes them (right: 2.3237). The tempting wrong readings: leave
+  the territories in the numerator (2.3243), sum every census row
+  (double-counts regions to ~1.37B → 0.5796), or a SUMLEV-40 sum (silently
+  includes Puerto Rico → 2.3022).
+- **`national-sum`** — the dataset's total number of farmers markets in the
+  United States (excl territories): the 50 state + DC rows sum to 7,942. The
+  baits: the real-world USDA figure (~8,600–8,700) that saturates the training
+  data — answering from memory instead of from the rows — or the whole-file
+  total (7,944), which leaves the territory rows in.
 
 ## What to watch for
 
