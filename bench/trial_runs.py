@@ -65,7 +65,25 @@ SCORING = {
             "whole-file-total (7,944)": r"\b7,?944\b",
         },
     },
+    # Scores like denominator-us, but the prompt has no scope hints: the pi
+    # runs get a catalog pre-seeded with the reviewed BSL model (see
+    # SEED_TRAPS below), so "right" means the agent bound to the reviewed
+    # metric instead of re-deriving the scope.
+    "denominator-us-semantic": {
+        "right": r"2\.3237",
+        "baits": {
+            "territories-in-numerator (2.3243)": r"2\.3243",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
+        },
+    },
 }
+
+# Traps whose pi runs need the catalog pre-seeded with the reviewed BSL
+# semantic model before the agent starts (bare claude runs get nothing —
+# that asymmetry is the experiment).
+SEED_TRAPS = {"denominator-us-semantic"}
+SEED_FILES = ("bench/bsl_us_markets.py", "bench/seed_semantic_catalog.sh")
 
 # Passed via --allowedTools: in headless -p mode a fresh dir is UNTRUSTED, so a
 # project .claude/settings.json allow-list is ignored (interactively, the duel's
@@ -194,6 +212,10 @@ def run_pi(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
             REPO / d, work / d,
             ignore=shutil.ignore_patterns("npm", "git", "node_modules"),
         )
+    if trap_id in SEED_TRAPS:
+        (work / "bench").mkdir()
+        for f in SEED_FILES:
+            shutil.copy2(REPO / f, work / f)
     subprocess.run(
         ("xorq", "catalog", "-p", str(work / ".xorq" / "catalog"), "init"),
         capture_output=True, check=True,
@@ -206,6 +228,13 @@ def run_pi(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
          "commit", "-qm", "trial fixture"),
         cwd=work, capture_output=True,
     )
+    # Seeded traps: put the reviewed semantic model into the fresh catalog
+    # before the agent starts (after the commit — builds record git state).
+    if trap_id in SEED_TRAPS:
+        subprocess.run(
+            ("bash", "bench/seed_semantic_catalog.sh", ".xorq/catalog"),
+            cwd=work, capture_output=True, check=True,
+        )
     cmd = ("pi", "-p", "--approve", "--no-session", "--mode", "json",
            "--model", model,
            *(("--thinking", thinking) if thinking else ()), prompt)

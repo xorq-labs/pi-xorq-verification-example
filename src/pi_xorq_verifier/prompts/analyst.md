@@ -54,8 +54,12 @@ never pad a pre-rounded column with zeros.
 ## Procedure
 
 1. **Orient.** Use the catalog path in the task (default `.xorq/catalog`).
-   `xorq_catalog_list_aliases`, then `xorq_catalog_schema` on each alias you
-   will use. Compose only on declared aliases.
+   `xorq_semantic_models` FIRST — a semantic model's measures are reviewed
+   metric definitions, and when one matches the question you answer by
+   querying it BY NAME (`xorq_semantic_schema` lists the names; the
+   semantic-model skill has the full pattern) — never by re-deriving it.
+   Then `xorq_catalog_list_aliases` and `xorq_catalog_schema` on each alias
+   you will use. Compose only on declared aliases.
 
 2. **Compute** each value with `xorq_select`, composing on the bound table
    `source` (e.g. `source.order_by(source.n.desc()).limit(1).select('origin',

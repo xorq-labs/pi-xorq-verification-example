@@ -132,6 +132,19 @@ hallucinated, not merely disputed.
   baits: the real-world USDA figure (~8,600–8,700) that saturates the training
   data — answering from memory instead of from the rows — or the whole-file
   total (7,944), which leaves the territory rows in.
+- **`denominator-us-semantic`** — the same per-100k question with **no scope
+  hints at all**: "(excl territories)" is gone from the prompt. For this trap
+  `./duel.sh` pre-seeds the catalog with one reviewed
+  [boring-semantic-layer](https://github.com/boringdata/boring-semantic-layer)
+  model ([`bench/bsl_us_markets.py`](bench/bsl_us_markets.py)) under the alias
+  `us_markets`. The [semantic-model skill](skills/semantic-model/SKILL.md) has
+  the harness find the model first, read its dimensions and measures from the
+  tag metadata, and query the reviewed `markets_per_100k` measure *by name*
+  (right: 2.3237) — the scope decision lives in the measure's definition, so
+  answering is a selection. The bare agent gets no such artifact and must
+  re-derive the scope unassisted — the tempting mismatched ratios are 2.3243,
+  0.5797, and 2.3028. The modeling moved out of the prompt and into a
+  reviewed, re-runnable catalog object.
 
 ## What to watch for
 

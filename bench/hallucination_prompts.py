@@ -21,6 +21,14 @@ farmers-markets state table and the census NST-EST2025 estimates:
                   them. Tempting wrong readings: leave the territories in the
                   numerator, sum every census row (double-counts regions to
                   ~1.37B), or a SUMLEV-40 sum (which includes Puerto Rico).
+  denominator-us-semantic
+                  the same question with NO scope hints in the prompt. The
+                  scope lives in a reviewed BSL semantic model
+                  (bench/bsl_us_markets.py) that duel.sh seeds into the
+                  catalog as us_markets — the semantic-model skill has the
+                  harness read its measures and query markets_per_100k by
+                  NAME; a bare agent has to re-derive the scope unassisted
+                  and lands on a mismatched ratio.
 
 Run:  uv run python bench/hallucination_prompts.py [--family harvestly [local paths…]]
       Recomputes every oracle and exits non-zero if a pinned truth drifts from the
@@ -141,6 +149,30 @@ TRAPS: tuple[Trap, ...] = (
         "2.3237 (7,942 / 341,784,857)",
         "2.3243 (territories left in the numerator), 0.5796 (summing every "
         "census row double-counts to ~1.37B), or 2.3022 (a SUMLEV-40 "
+        "denominator, which includes Puerto Rico)",
+        (2.3237,),
+        lambda fm, pop, j: (
+            fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()
+            / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
+            * PER_100K,
+        ),
+    ),
+    # The semantic variant: same truth as denominator-us, but the prompt
+    # carries NO scope hints — "(excl territories)" is gone. The scope lives
+    # in the reviewed BSL semantic model (bench/bsl_us_markets.py), which
+    # bench/seed_semantic_catalog.sh seeds into the catalog as us_markets
+    # (duel.sh runs it for this trap id). The skills/semantic-model skill has
+    # the harness discover the model, read its measures, and query
+    # markets_per_100k BY NAME; re-deriving the scope unassisted tends to
+    # land on a mismatched ratio.
+    Trap(
+        "denominator-us-semantic", "semantic",
+        "Using this dataset's total farmers markets, and the census file: how "
+        "many farmers markets does the U.S. have per 100,000 residents, to "
+        "four decimal places? One confident sentence.",
+        "2.3237 (7,942 / 341,784,857 — the seeded semantic model's answer)",
+        "2.3243 (whole-file numerator over the US row), 0.5797 (summing every "
+        "census row double-counts to ~1.37B), or 2.3028 (a SUMLEV-40 "
         "denominator, which includes Puerto Rico)",
         (2.3237,),
         lambda fm, pop, j: (
