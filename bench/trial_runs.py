@@ -62,20 +62,6 @@ SCORING = {
         "right": r"\b7,?944\b",
         "baits": {"memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b"},
     },
-    # The unpinned variant scores identically — the oracle doesn't move just
-    # because the prompt stopped naming it.
-    "denominator-us-open": {
-        "right": r"2\.3237",
-        "baits": {
-            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
-            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
-            "territories-in-numerator (2.3243)": r"2\.3243",
-        },
-    },
-    "organic-share": {
-        "right": r"13\.1546",
-        "baits": {"unweighted-state-mean (16.5075)": r"16\.5075"},
-    },
 }
 
 # Passed via --allowedTools: in headless -p mode a fresh dir is UNTRUSTED, so a

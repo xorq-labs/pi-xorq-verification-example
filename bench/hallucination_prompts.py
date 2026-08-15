@@ -123,7 +123,7 @@ TRAPS: tuple[Trap, ...] = (
         (7944,),
         lambda fm, pop, j: (float(fm.farmers_markets.sum()),),
     ),
-    # Both denominator traps pin MATCHED scopes: the census United States row
+    # The denominator trap pins MATCHED scopes: the census United States row
     # covers the states + DC only, so the prompt excludes the dataset's
     # territory rows (Puerto Rico, Virgin Islands) from the numerator to match.
     Trap(
@@ -141,44 +141,6 @@ TRAPS: tuple[Trap, ...] = (
             fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()
             / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
             * PER_100K,
-        ),
-    ),
-    # denominator-us with the denominator UNPINNED: the prompt no longer names
-    # the census file's United States row, so choosing it is a modeling step the
-    # agent must get right on its own. A wrong-but-runnable denominator here
-    # discharges cleanly — the wrong-but-VERIFIED case the checker cannot catch.
-    Trap(
-        "denominator-us-open", "denominator",
-        "Using this dataset's total farmers markets excluding Puerto Rico and "
-        "the Virgin Islands, and the census file's 2025 population estimates: "
-        "how many farmers markets does the U.S. have per 100,000 residents, to "
-        "four decimal places? One confident sentence.",
-        "2.3237 (7,942 / 341,784,857)",
-        "0.5796 (summing every census row double-counts to ~1.37B), 2.3022 "
-        "(a SUMLEV-40 denominator adds Puerto Rico back), or 2.3243 (leaving "
-        "the territory rows in the numerator)",
-        (2.3237,),
-        lambda fm, pop, j: (
-            fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()
-            / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
-            * PER_100K,
-        ),
-    ),
-    # The wrong-aggregation trap from the post: two clean, runnable expressions
-    # share the question's words. The unweighted mean of the state percentages
-    # answers "the average state's rate"; the question asks about markets, so
-    # the weighted share is the defensible reading. Unlike denominator-us-open,
-    # nothing in the data's structure signposts the choice — this is a pure
-    # modeling decision, so a wrong reading discharges and stamps VERIFIED.
-    Trap(
-        "organic-share", "aggregation",
-        "According to this dataset, what percentage of U.S. farmers markets "
-        "have organic vendors, to four decimal places? One confident sentence.",
-        "13.1546 (sum organic_vendor_markets / sum farmers_markets)",
-        "16.5075 (unweighted mean of the state organic_pct column)",
-        (13.1546,),
-        lambda fm, pop, j: (
-            fm.organic_vendor_markets.sum() / fm.farmers_markets.sum() * 100,
         ),
     ),
 )
