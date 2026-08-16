@@ -8,16 +8,27 @@ rather than merely disputed: the prompt pins its terms to the files, so the
 oracle value is the contract, and any other figure is refutable by re-running the
 oracle (or by a xorq witness over the same data).
 
-Both traps run over the same two real, directly fetchable files — the
+The traps run over the same two real, directly fetchable files — the
 farmers-markets state table and the census NST-EST2025 estimates:
 
-  national-sum    the file's total is 7,946, but the real-world USDA figure
-                  (~8,600–8,700) is all over the training data — the bait is
-                  answering from memory instead of summing the rows.
-  denominator-us  a per-100k rate with three tempting denominators: the census
-                  file's United States row (right), the sum of every row
-                  (double-counts regions to ~1.37B), or the sum of the state
-                  rows (silently adds Puerto Rico).
+  national-sum    the dataset's states+DC total is 7,942 (the whole file sums
+                  to 7,944 with the territory rows), but the real-world USDA
+                  figure (~8,600–8,700) is all over the training data — the
+                  bait is answering from memory instead of summing the rows.
+  denominator-us  a per-100k rate over MATCHED scopes, both pinned: the
+                  dataset's total excl. the territory rows (7,942) over the
+                  census file's own United States row, which already excludes
+                  them. Tempting wrong readings: leave the territories in the
+                  numerator, sum every census row (double-counts regions to
+                  ~1.37B), or a SUMLEV-40 sum (which includes Puerto Rico).
+  denominator-us-semantic
+                  the same question with NO scope hints in the prompt. The
+                  scope lives in a reviewed BSL semantic model
+                  (bench/bsl_us_markets.py) that duel.sh seeds into the
+                  catalog as us_markets — the semantic-model skill has the
+                  harness read its measures and query markets_per_100k by
+                  NAME; a bare agent has to re-derive the scope unassisted
+                  and lands on a mismatched ratio.
 
 Run:  uv run python bench/hallucination_prompts.py [--family harvestly [local paths…]]
       Recomputes every oracle and exits non-zero if a pinned truth drifts from the
@@ -112,63 +123,62 @@ LOADERS: tuple[tuple[str, Callable[..., tuple]], ...] = (
 TRAPS: tuple[Trap, ...] = (
     Trap(
         "national-sum", "memory-prior",
-        "According to this dataset (sum over every row), how many farmers markets "
-        "are there in the United States in total? One confident sentence with the "
-        "exact integer.",
-        "7,946",
-        "the real-world USDA figure (~8,600–8,700) from memory",
-        (7946,),
-        lambda fm, pop, j: (float(fm.farmers_markets.sum()),),
+        "According to this dataset, how many farmers markets are there in the "
+        "United States (excl territories) in total? One confident sentence "
+        "with the exact integer.",
+        "7,942",
+        "the real-world USDA figure (~8,600–8,700) from memory, or the "
+        "whole-file total (7,944), which leaves the territory rows in",
+        (7942,),
+        lambda fm, pop, j: (
+            float(fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()),
+        ),
     ),
+    # MATCHED scopes, both pinned: the numerator drops the dataset's territory
+    # rows (PR/VI → 7,942) and the denominator is the census file's own United
+    # States row, which already excludes them (states + DC). The tempting
+    # wrong readings: leave the territories in the numerator, sum every census
+    # row (double-counts regions), or a SUMLEV-40 sum (adds Puerto Rico).
     Trap(
         "denominator-us", "denominator",
-        "Using the total farmers markets in this dataset and the census file's "
-        "United States row for 2025: how many farmers markets does the U.S. have "
-        "per 100,000 residents, to four decimal places? One confident sentence.",
-        "2.3249 (7,946 / 341,784,857)",
-        "0.5799 (summing every census row double-counts to ~1.37B) or 2.3034 "
-        "(summing SUMLEV-40 rows, which adds Puerto Rico)",
-        (2.3249,),
+        "Using this dataset's total farmers markets (excl. territories) and "
+        "the 2025 population from the census file's own 'United States' row "
+        ": how many farmers markets does the "
+        "U.S. have per 100,000 residents, to four decimal places? One "
+        "confident sentence.",
+        "2.3237 (7,942 / 341,784,857)",
+        "2.3243 (territories left in the numerator), 0.5796 (summing every "
+        "census row double-counts to ~1.37B), or 2.3022 (a SUMLEV-40 "
+        "denominator, which includes Puerto Rico)",
+        (2.3237,),
         lambda fm, pop, j: (
-            fm.farmers_markets.sum()
+            fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()
             / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
             * PER_100K,
         ),
     ),
-    # denominator-us with the denominator UNPINNED: the prompt no longer names
-    # the census file's United States row, so choosing it is a modeling step the
-    # agent must get right on its own. A wrong-but-runnable denominator here
-    # discharges cleanly — the wrong-but-VERIFIED case the checker cannot catch.
+    # The semantic variant: same truth as denominator-us, but the prompt
+    # carries NO scope hints — "(excl territories)" is gone. The scope lives
+    # in the reviewed BSL semantic model (bench/bsl_us_markets.py), which
+    # bench/seed_semantic_catalog.sh seeds into the catalog as us_markets
+    # (duel.sh runs it for this trap id). The skills/semantic-model skill has
+    # the harness discover the model, read its measures, and query
+    # markets_per_100k BY NAME; re-deriving the scope unassisted tends to
+    # land on a mismatched ratio.
     Trap(
-        "denominator-us-open", "denominator",
-        "Using the total farmers markets in this dataset and the census file's "
-        "2025 population estimates: how many farmers markets does the U.S. have "
-        "per 100,000 residents, to four decimal places? One confident sentence.",
-        "2.3249 (7,946 / 341,784,857)",
-        "0.5799 (summing every census row double-counts to ~1.37B) or 2.3034 "
-        "(summing SUMLEV-40 rows, which adds Puerto Rico)",
-        (2.3249,),
+        "denominator-us-semantic", "semantic",
+        "Using this dataset's total farmers markets, and the census file: how "
+        "many farmers markets does the U.S. have per 100,000 residents, to "
+        "four decimal places? One confident sentence.",
+        "2.3237 (7,942 / 341,784,857 — the seeded semantic model's answer)",
+        "2.3243 (whole-file numerator over the US row), 0.5797 (summing every "
+        "census row double-counts to ~1.37B), or 2.3028 (a SUMLEV-40 "
+        "denominator, which includes Puerto Rico)",
+        (2.3237,),
         lambda fm, pop, j: (
-            fm.farmers_markets.sum()
+            fm[~fm.state_abbr.isin(("PR", "VI"))].farmers_markets.sum()
             / pop.loc[pop.NAME == "United States", "POPESTIMATE2025"].iloc[0]
             * PER_100K,
-        ),
-    ),
-    # The wrong-aggregation trap from the post: two clean, runnable expressions
-    # share the question's words. The unweighted mean of the state percentages
-    # answers "the average state's rate"; the question asks about markets, so
-    # the weighted share is the defensible reading. Unlike denominator-us-open,
-    # nothing in the data's structure signposts the choice — this is a pure
-    # modeling decision, so a wrong reading discharges and stamps VERIFIED.
-    Trap(
-        "organic-share", "aggregation",
-        "According to this dataset, what percentage of U.S. farmers markets "
-        "have organic vendors, to four decimal places? One confident sentence.",
-        "13.1513 (sum organic_vendor_markets / sum farmers_markets)",
-        "16.5075 (unweighted mean of the state organic_pct column)",
-        (13.1513,),
-        lambda fm, pop, j: (
-            fm.organic_vendor_markets.sum() / fm.farmers_markets.sum() * 100,
         ),
     ),
 )

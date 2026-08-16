@@ -14,7 +14,23 @@ It is managed **only** by the `xorq catalog` CLI — never hand-edit a
 `catalog.yaml`; a hand-written `entries:/aliases:` YAML is not a catalog and
 errors (`unsupported operand type(s) for +: 'dict' and 'str'`).
 
-## Discover
+## Discover — BEFORE ingesting anything
+
+Orient first, plan second. Even when the question hands you source URLs, do
+NOT start by ingesting them — the catalog may already hold what the question
+needs, and the semantic-model check below is the whole reason this flow exists:
+
+```
+xorq_semantic_models   catalog_path=.xorq/catalog   # reviewed measures FIRST
+```
+
+If a listed model's measure matches the question (a rate, a total, a
+per-capita — read the measure names), you answer by querying that measure BY
+NAME — the semantic-model skill has the pattern — and you do not ingest the
+raw sources at all, even though the prompt cites them: the measure's reviewed
+definition already encodes the scope the prompt leaves unstated, and
+re-deriving it from the raw files is how defensible-looking wrong answers
+happen. Only with no matching measure do you continue here:
 
 ```bash
 xorq catalog -p .xorq/catalog list-aliases   # what's available
@@ -131,7 +147,14 @@ Three mechanical rules, all from real failed runs:
   parallel tool calls.** Every write commits into the catalog's git repo; two in
   flight contend on its `index.lock` and one fails (`Lock … could not be
   obtained`). If you hit that error, just re-run the failed command — do not
-  delete the lock file.
+  delete the lock file. The collision can also surface as a **bare `Error:`
+  with no message**, leaving a HALF-WRITTEN catalog: `catalog.yaml` lists the
+  entries and the alias symlinks exist, but every later command
+  (`list-aliases`, `schema`, another `add`) errors the same way, and re-running
+  does NOT help. Recovery: `rm -rf` the catalog directory, `init` it fresh, and
+  re-`add` every build it held ONE AT A TIME — the builds under `.xorq/builds`
+  are intact, nothing needs rebuilding (if the catalog was pre-seeded for you,
+  re-run the seeding too).
 
 - **Run `xorq build` and `catalog add` from the same directory** (the repo root,
   as above — no `cd`). The emitted build path is *relative to where `xorq build`

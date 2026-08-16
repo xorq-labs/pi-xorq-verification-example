@@ -31,6 +31,8 @@ import {
   foldCertificate,
   gateBanner,
   gbacked,
+  statedRefuted,
+  statedUncovered,
   type CertFold,
 } from "./lib/gate.ts";
 
@@ -202,7 +204,19 @@ const certComponent = (cert: any) => ({ render: (width: number) => certLines(cer
 function certText(cert: any): string {
   // The same card the TUI draws, as plain text (no ANSI) — this is the tool
   // result content, so external viewers and the model get the full certificate.
-  return stripAnsi(certLines(cert, 200).join("\n"));
+  const base = stripAnsi(certLines(cert, 200).join("\n"));
+  // The answer contract, stated BEFORE the answer is written (the observed
+  // failure: a discharged headline value shipped alongside undischarged
+  // supporting figures — "from 7,942 markets and 341,784,857 residents" —
+  // and the gate rightly stamped NOT VERIFIED, but only after the fact).
+  const vals = [...new Set(dischargedValues(cert))];
+  if (!vals.length) return base;
+  return (
+    base +
+    `\nanswer contract: every figure in the final answer must be discharged — ` +
+    `this certificate covers: ${vals.join(", ")}. A supporting number you did ` +
+    `not verify (totals, populations) must be verified too or left out.`
+  );
 }
 
 // Render a source-lineage verdict ({verdict, alias, sources, upstream_entries,
@@ -320,7 +334,28 @@ export default function (pi: ExtensionAPI) {
         { timeout: SHORT, signal },
       );
       if (r.code !== 0) throw new Error(`xorq catalog list-aliases: ${r.stderr}`);
-      return { content: [{ type: "text", text: r.stdout }] };
+      // Surface semantic models WHERE the agent already looks: annotate each
+      // tagged alias inline so model discovery never depends on remembering
+      // to call xorq_semantic_models first.
+      const lines: string[] = [];
+      let sawModel = false;
+      for (const raw of r.stdout.split("\n")) {
+        const alias = raw.trim().split(/\s+/)[0];
+        if (alias && !isWitnessAlias(alias)) {
+          const tm = await cachedBslTag(params.catalog_path, alias, signal);
+          if (tm) {
+            sawModel = true;
+            lines.push(`${raw}   ← SEMANTIC MODEL (measures: ${pairNames(tm.measures).join(", ")})`);
+            continue;
+          }
+        }
+        lines.push(raw);
+      }
+      const footer = sawModel
+        ? "\nA semantic model's measures are reviewed metric definitions — read them by " +
+          "name with xorq_semantic_select (schema via xorq_semantic_schema); never re-derive them.\n"
+        : "";
+      return { content: [{ type: "text", text: lines.join("\n") + footer }] };
     },
   });
 
@@ -364,7 +399,226 @@ export default function (pi: ExtensionAPI) {
         { timeout: SHORT, signal },
       );
       if (r.code !== 0) throw new Error(`xorq catalog schema: ${r.stderr}`);
-      return { content: [{ type: "text", text: r.stdout }] };
+      // The observed wrong turn: an agent reads a semantic alias's raw columns
+      // here, concludes "the data is already combined", and hand-aggregates.
+      // Say what the alias IS at the moment the plan is being formed.
+      let note = "";
+      if (!isWitnessAlias(params.alias)) {
+        const tm = await cachedBslTag(params.catalog_path, params.alias, signal);
+        if (tm)
+          note =
+            `\nThis alias is a SEMANTIC MODEL (${tm.name}) — the columns above are its raw ` +
+            `base, but the reviewed definitions are its measures: ` +
+            `${pairNames(tm.measures).join(", ")} (dimensions: ${pairNames(tm.dimensions).join(", ")}). ` +
+            `Read them by name with xorq_semantic_select; do NOT re-derive them from the raw columns.\n`;
+      }
+      return { content: [{ type: "text", text: r.stdout + note }] };
+    },
+  });
+
+  // ----------------------------------------------------------------------- //
+  // semantic models (BSL): reviewed dimension/measure definitions            //
+  // ----------------------------------------------------------------------- //
+
+  // The BSL tag metadata of one alias, from `xorq catalog show --json` — or
+  // null when the alias carries no semantic model.
+  async function bslTag(catalogPath: string, alias: string, signal?: AbortSignal) {
+    const r = await pi.exec(
+      "xorq",
+      ["catalog", "-p", catalogPath, "show", alias, "--json"],
+      { timeout: SHORT, signal },
+    );
+    if (r.code !== 0) return null;
+    let doc: any;
+    try { doc = JSON.parse(r.stdout); } catch { return null; }
+    for (const n of doc?.expr_metadata?.lineage?.nodes ?? []) {
+      const tm = n?.tag_metadata;
+      if ((n?.type === "Tag" || n?.type === "HashingTag") && tm?.tag === "bsl") return tm;
+    }
+    return null;
+  }
+  // Positive tag lookups are cached per (catalog, alias): a model, once
+  // present under an alias, stays a model for the session, and the lookup
+  // rides on tools that fire on every turn (list-aliases, schema, select).
+  // Negative results are NOT cached — an alias can gain a model mid-session.
+  const bslTagCache = new Map<string, any>();
+  async function cachedBslTag(catalogPath: string, alias: string, signal?: AbortSignal) {
+    const key = `${catalogPath} ${alias}`;
+    if (bslTagCache.has(key)) return bslTagCache.get(key);
+    const tm = await bslTag(catalogPath, alias, signal);
+    if (tm) bslTagCache.set(key, tm);
+    return tm;
+  }
+  // The harness's own persisted witnesses (verify-<id>) are composed FROM
+  // tagged models and inherit the tag — they are not models to answer from.
+  const isWitnessAlias = (a: string) => a.startsWith("verify-");
+  // tag metadata lists dims/measures as [name, [[key, value], …]] pairs
+  const pairNames = (pairs: any): string[] =>
+    Array.isArray(pairs) ? pairs.map((p: any) => (Array.isArray(p) ? String(p[0]) : String(p))) : [];
+  const pairAttrs = (pair: any): Record<string, any> =>
+    Array.isArray(pair?.[1]) ? Object.fromEntries(pair[1].filter((kv: any) => Array.isArray(kv))) : {};
+
+  pi.registerTool({
+    name: "xorq_semantic_models",
+    label: "List semantic models",
+    description:
+      "List the catalog's SEMANTIC MODELS (BSL): aliases carrying reviewed dimension/measure " +
+      "definitions that already encode the modeling decisions — scopes, joins, exclusions — " +
+      "that a question leaves unstated. Call this FIRST for any data question. If a measure " +
+      "matches the question, answer by querying it BY NAME (see xorq_semantic_schema) instead " +
+      "of composing your own aggregate — re-deriving a metric a reviewed measure already " +
+      "defines is how defensible-looking wrong answers happen.",
+    parameters: Type.Object({
+      catalog_path: Type.String({ description: "Path to the xorq catalog" }),
+    }),
+    async execute(_id, params, signal) {
+      const r = await pi.exec(
+        "xorq",
+        ["catalog", "-p", params.catalog_path, "list-aliases"],
+        { timeout: SHORT, signal },
+      );
+      if (r.code !== 0) throw new Error(`xorq catalog list-aliases: ${r.stderr}`);
+      const aliases = r.stdout
+        .split("\n")
+        .map((l: string) => l.trim().split(/\s+/)[0])
+        .filter(Boolean);
+      const models: any[] = [];
+      for (const alias of aliases) {
+        // Persisted verify-<id> witnesses inherit the model's tag (they are
+        // composed from it) — list the models, not the harness's own receipts.
+        if (isWitnessAlias(alias)) continue;
+        const tm = await cachedBslTag(params.catalog_path, alias, signal);
+        if (tm)
+          models.push({
+            alias,
+            name: tm.name,
+            dimensions: pairNames(tm.dimensions),
+            measures: pairNames(tm.measures),
+          });
+      }
+      if (!models.length)
+        return {
+          content: [{
+            type: "text",
+            text: "No semantic models in this catalog — fall back to the ordinary ingest/compose flow.",
+          }],
+        };
+      const text =
+        models
+          .map(
+            (m) =>
+              `${m.alias}  (model: ${m.name})\n` +
+              `  dimensions: ${m.dimensions.join(", ") || "—"}\n` +
+              `  measures:   ${m.measures.join(", ") || "—"}`,
+          )
+          .join("\n") +
+        "\n\nRead a measure with xorq_semantic_select (measures=['<measure>']).\n" +
+        "Pick the measure that answers the question DIRECTLY — never fetch component\n" +
+        "measures and combine them by hand: hand arithmetic fails verification.";
+      return { content: [{ type: "text", text }], details: models };
+    },
+  });
+
+  pi.registerTool({
+    name: "xorq_semantic_schema",
+    label: "Semantic model schema",
+    description:
+      "Show one semantic model's reviewed DIMENSIONS and MEASURES (names + attributes). Use the " +
+      "exact names in xorq_select compose code — measures by name, never re-derived: " +
+      "source.ls.builder.query(measures=['m']).to_tagged() — sliced: " +
+      "source.ls.builder.query(dimensions=['d'], measures=['m']).to_tagged(). Declare the " +
+      "value's obligation on the same alias with that same query as `expression` and " +
+      "predicate.select = the measure name.",
+    parameters: Type.Object({
+      catalog_path: Type.String({ description: "Path to the xorq catalog" }),
+      alias: Type.String({ description: "A semantic-model alias from xorq_semantic_models" }),
+    }),
+    async execute(_id, params, signal) {
+      const tm = await bslTag(params.catalog_path, params.alias, signal);
+      if (!tm)
+        throw new Error(
+          `${params.alias} carries no BSL semantic tag — use xorq_catalog_schema for plain aliases`,
+        );
+      const section = (label: string, pairs: any) => {
+        const rows = (Array.isArray(pairs) ? pairs : []).map((p: any) => {
+          const attrs = pairAttrs(p);
+          const desc = attrs.description ? `  — ${attrs.description}` : "";
+          return `  ${Array.isArray(p) ? p[0] : p}${desc}`;
+        });
+        return `${label}:\n${rows.join("\n") || "  —"}`;
+      };
+      const text = [
+        `semantic model: ${tm.name} (alias ${params.alias})`,
+        section("dimensions", tm.dimensions),
+        section("measures", tm.measures),
+        "",
+        "Read values with xorq_semantic_select: measures=['<measure>'] (+ optional",
+        "dimensions=['<dim>'] to slice). Measures are NOT columns of the alias.",
+        "Pick the measure that answers the question directly — combining component",
+        "measures by hand fails verification.",
+        "Verify with predicate = {\"measures\": [\"<measure>\"], \"select\": \"<measure>\"}",
+        "— no `expression`: the checker synthesizes the reviewed query itself.",
+      ].join("\n");
+      return { content: [{ type: "text", text }], details: tm };
+    },
+  });
+
+  // A measure/dimension name as BSL declares them (joined models expose
+  // dotted names); anything else could smuggle code into the compose string.
+  const SEM_NAME = /^[A-Za-z_][A-Za-z0-9_.]*$/;
+
+  pi.registerTool({
+    name: "xorq_semantic_select",
+    label: "Select from semantic model",
+    description:
+      "Read REVIEWED measures from a semantic-model alias BY NAME — the semantic " +
+      "counterpart of xorq_select, with no compose string to assemble. Pass the " +
+      "measure that answers the question directly (plus dimensions to slice by); " +
+      "the tool builds and runs the model's own query. Returns CSV. Verify the " +
+      "value with an obligation on the same alias: predicate = {\"measures\": " +
+      "[\"<measure>\"], \"select\": \"<measure>\"} — no `expression`; the checker " +
+      "synthesizes the reviewed query itself.",
+    parameters: Type.Object({
+      catalog_path: Type.String({ description: "Path to the xorq catalog" }),
+      alias: Type.String({ description: "A semantic-model alias from xorq_semantic_models" }),
+      measures: Type.Array(Type.String(), {
+        description: "Measure NAMES from xorq_semantic_schema (at least one)",
+      }),
+      dimensions: Type.Optional(
+        Type.Array(Type.String(), {
+          description: "Optional dimension NAMES to slice the measures by",
+        }),
+      ),
+      limit: Type.Optional(
+        Type.Number({ description: "Max rows returned (default 50; 0 = uncap)" }),
+      ),
+    }),
+    async execute(_id, params, signal) {
+      const dims = params.dimensions ?? [];
+      const bad = [...params.measures, ...dims].filter((s: string) => !SEM_NAME.test(s));
+      if (params.measures.length === 0) throw new Error("pass at least one measure name");
+      if (bad.length) throw new Error(`not measure/dimension names: ${bad.join(", ")}`);
+      const q = (names: string[]) => `[${names.map((s) => `'${s}'`).join(", ")}]`;
+      const compose =
+        `source.ls.builder.query(` +
+        (dims.length ? `dimensions=${q(dims)}, ` : "") +
+        `measures=${q(params.measures)}).to_tagged()`;
+      const n = params.limit === undefined ? 50 : params.limit;
+      const [cmd, argv] = checkCmd(
+        "select",
+        "--catalog-path", params.catalog_path,
+        "--on", params.alias,
+        "-c", compose,
+        "--limit", String(n),
+      );
+      const r = await pi.exec(cmd, argv, { timeout: LONG, signal });
+      if (r.code !== 0) throw new Error(`xorq_semantic_select: ${r.stderr}`);
+      const note =
+        `\n(reviewed query: ${compose})\n` +
+        `verify with: predicate = {"measures": ${JSON.stringify(params.measures)}` +
+        (dims.length ? `, "dimensions": ${JSON.stringify(dims)}` : "") +
+        `, "select": "${params.measures[0]}"}`;
+      return { content: [{ type: "text", text: r.stdout + note }] };
     },
   });
 
@@ -416,9 +670,20 @@ export default function (pi: ExtensionAPI) {
       const r = await pi.exec(cmd, argv, { timeout: LONG, signal });
       if (r.code !== 0) throw new Error(`xorq_select: ${r.stderr}`);
       const capped = n > 0 && !/\.limit\s*\(/.test(params.compose);
-      const note = capped
+      let note = capped
         ? `\n(showing up to ${n} rows; pass limit or aggregate to count — do not page)`
         : "";
+      // A hand-written compose on a semantic-model alias SUCCEEDS silently —
+      // and then its derived value fails selection_only at verify time. Warn
+      // at the moment of success, not at the moment of failure.
+      if (!isWitnessAlias(params.on) && !params.compose.includes("ls.builder")) {
+        const tm = await cachedBslTag(params.catalog_path, params.on, signal);
+        if (tm)
+          note +=
+            `\nnote: '${params.on}' is a SEMANTIC MODEL — values derived by hand from its raw ` +
+            `columns will fail verification (selection_only). Use its reviewed measures ` +
+            `(${pairNames(tm.measures).join(", ")}) via xorq_semantic_select instead.`;
+      }
       return { content: [{ type: "text", text: r.stdout + note }] };
     },
   });
@@ -438,7 +703,10 @@ export default function (pi: ExtensionAPI) {
       "re-runs the witness itself. An ungrounded scalar whose value is a bare cell " +
       "of the alias needs only predicate.select (the checker synthesizes the " +
       "selection); pass `expression` (its full expression) only when the cell must " +
-      "be computed. Verify a TABLE/RANKING as one `kind:table` obligation " +
+      "be computed. A SEMANTIC-MODEL value (a BSL measure read via " +
+      "xorq_semantic_select) is declared with predicate.measures=['<measure>'] and " +
+      "predicate.select='<measure>' — NO expression, NO population: the checker " +
+      "synthesizes the reviewed query itself. Verify a TABLE/RANKING as one `kind:table` obligation " +
       "(predicate.columns/rows/ordered/metric_col, population in `population`) so every cell and the " +
       "ordering are checked — do not cherry-pick scalars from a table. Put EVERY " +
       "number you will print in `reply_values` (uncovered values downgrade to " +
@@ -492,7 +760,23 @@ export default function (pi: ExtensionAPI) {
                       "Ungrounded scalar ONLY, and only when the cell must be computed (e.g. source.aggregate(total=source.n.sum())). A bare cell of the alias needs only predicate.select.",
                   }),
                 ),
-                predicate: Type.Object({}, { additionalProperties: true }),
+                predicate: Type.Object(
+                  {
+                    measures: Type.Optional(
+                      Type.Array(Type.String(), {
+                        description:
+                          "Semantic-model scalar: BSL measure names — the checker synthesizes the model's own query; never pair with `expression` or `population`. Set `select` to the claimed measure.",
+                      }),
+                    ),
+                    dimensions: Type.Optional(
+                      Type.Array(Type.String(), {
+                        description:
+                          "Semantic-model scalar: optional slicing dimensions; ground a sliced row with entity_col/entity_val.",
+                      }),
+                    ),
+                  },
+                  { additionalProperties: true },
+                ),
                 value_type: Type.Optional(Type.Object({}, { additionalProperties: true })),
                 requires_sources: Type.Optional(
                   Type.Array(Type.String(), {
@@ -655,8 +939,11 @@ export default function (pi: ExtensionAPI) {
         catalogState: _cat,
         unbacked,
         lineageFails,
-        refuted: _fold.refuted,
-        uncoveredCert: _fold.uncovered,
+        // Standing refutations / coverage gaps refuse only the answer that
+        // STATES them (numeric surfaces; text refutations stand regardless) —
+        // a typo'd, abandoned obligation must not condemn a backed answer.
+        refuted: statedRefuted(_fold.refuted, claims, answer),
+        uncoveredCert: statedUncovered(_fold.uncovered, claims, answer),
         lineageChecked: _lineageMap.size > 0,
         superlatives,
         hasExtremal: _extremal,

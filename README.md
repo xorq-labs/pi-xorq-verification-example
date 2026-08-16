@@ -114,20 +114,37 @@ gifsicle -O3 --lossy=90 --colors 48 demo.gif -o demo-small.gif
 
 ## What the prompts are
 
-Both prompts in `bench/hallucination_prompts.py` are **traps with an executable
+The prompts in `bench/hallucination_prompts.py` are **traps with an executable
 oracle**: each pins its terms to two real public data files (a farmers-markets
 state table and the census NST-EST2025 estimates), so there is exactly one
 defensible answer and it is recomputable. A wrong answer is *provably*
 hallucinated, not merely disputed.
 
-- **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents.
-  A cross-dataset ratio with three tempting denominators: the census file's
-  United States row (right: 2.3249), the sum of every census row (double-counts
-  regions to ~1.37B → 0.5799), or the sum of the state rows (silently adds
-  Puerto Rico → 2.3034).
-- **`national-sum`** — the dataset's total number of farmers markets. The file
-  sums to 7,946, but the real-world USDA figure (~8,600–8,700) saturates the
-  training data — the bait is answering from memory instead of from the rows.
+- **`denominator-us`** (default) — farmers markets per 100,000 U.S. residents
+  over matched scopes, both terms pinned: the dataset's total excluding the
+  territory rows (7,942) over the census file's own United States row, which
+  already excludes them (right: 2.3237). The tempting wrong readings: leave
+  the territories in the numerator (2.3243), sum every census row
+  (double-counts regions to ~1.37B → 0.5796), or a SUMLEV-40 sum (silently
+  includes Puerto Rico → 2.3022).
+- **`national-sum`** — the dataset's total number of farmers markets in the
+  United States (excl territories): the 50 state + DC rows sum to 7,942. The
+  baits: the real-world USDA figure (~8,600–8,700) that saturates the training
+  data — answering from memory instead of from the rows — or the whole-file
+  total (7,944), which leaves the territory rows in.
+- **`denominator-us-semantic`** — the same per-100k question with **no scope
+  hints at all**: "(excl territories)" is gone from the prompt. For this trap
+  `./duel.sh` pre-seeds the catalog with one reviewed
+  [boring-semantic-layer](https://github.com/boringdata/boring-semantic-layer)
+  model ([`bench/bsl_us_markets.py`](bench/bsl_us_markets.py)) under the alias
+  `us_markets`. The [semantic-model skill](skills/semantic-model/SKILL.md) has
+  the harness find the model first, read its dimensions and measures from the
+  tag metadata, and query the reviewed `markets_per_100k` measure *by name*
+  (right: 2.3237) — the scope decision lives in the measure's definition, so
+  answering is a selection. The bare agent gets no such artifact and must
+  re-derive the scope unassisted — the tempting mismatched ratios are 2.3243,
+  0.5797, and 2.3028. The modeling moved out of the prompt and into a
+  reviewed, re-runnable catalog object.
 
 ## What to watch for
 

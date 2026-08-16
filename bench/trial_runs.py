@@ -48,31 +48,42 @@ MODEL_PI = "anthropic/claude-haiku-4-5"
 # prompt pins it; `baits` are the trap's NAMED wrong readings (attributable
 # failure modes), checked only when `right` is absent.
 SCORING = {
+    # The two-value alternations pair either numerator (7,942 territories
+    # excluded, or 7,944 whole-file) with the same wrong denominator.
     "denominator-us": {
-        "right": r"2\.3249",
+        "right": r"2\.3237",
         "baits": {
-            "double-count-all-rows (0.5799)": r"0\.5799",
-            "sumlev40-adds-PR (2.3034)": r"2\.3034",
+            "territories-in-numerator (2.3243)": r"2\.3243",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
         },
     },
     "national-sum": {
-        "right": r"\b7,?946\b",
-        "baits": {"memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b"},
-    },
-    # The unpinned variant scores identically — the oracle doesn't move just
-    # because the prompt stopped naming it.
-    "denominator-us-open": {
-        "right": r"2\.3249",
+        "right": r"\b7,?942\b",
         "baits": {
-            "double-count-all-rows (0.5799)": r"0\.5799",
-            "sumlev40-adds-PR (2.3034)": r"2\.3034",
+            "memory-prior (~8,6xx-8,7xx)": r"\b8[,.]?[67]\d{2}\b",
+            "whole-file-total (7,944)": r"\b7,?944\b",
         },
     },
-    "organic-share": {
-        "right": r"13\.1513",
-        "baits": {"unweighted-state-mean (16.5075)": r"16\.5075"},
+    # Scores like denominator-us, but the prompt has no scope hints: the pi
+    # runs get a catalog pre-seeded with the reviewed BSL model (see
+    # SEED_TRAPS below), so "right" means the agent bound to the reviewed
+    # metric instead of re-deriving the scope.
+    "denominator-us-semantic": {
+        "right": r"2\.3237",
+        "baits": {
+            "territories-in-numerator (2.3243)": r"2\.3243",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
+        },
     },
 }
+
+# Traps whose pi runs need the catalog pre-seeded with the reviewed BSL
+# semantic model before the agent starts (bare claude runs get nothing —
+# that asymmetry is the experiment).
+SEED_TRAPS = {"denominator-us-semantic"}
+SEED_FILES = ("bench/bsl_us_markets.py", "bench/seed_semantic_catalog.sh")
 
 # Passed via --allowedTools: in headless -p mode a fresh dir is UNTRUSTED, so a
 # project .claude/settings.json allow-list is ignored (interactively, the duel's
@@ -117,14 +128,16 @@ def claude_tokens(payload: dict) -> dict:
     }
 
 
-def pi_answer_and_usage(stdout: str) -> tuple[str, dict, float | None]:
+def pi_answer_and_usage(stdout: str) -> tuple[str, dict, float | None, int]:
     """Parse a `pi --mode json` event stream: the terminal answer (last assistant
     message with text and no tool calls — the gate's banner is prepended into that
-    same message), summed token usage, and total cost."""
+    same message), summed token usage, total cost, and the number of assistant
+    turns (each assistant message_end is one model turn)."""
     answer = ""
     tokens = {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}
     cost = 0.0
     priced = False
+    turns = 0
     for line in stdout.splitlines():
         try:
             ev = json.loads(line)
@@ -135,6 +148,7 @@ def pi_answer_and_usage(stdout: str) -> tuple[str, dict, float | None]:
         msg = ev.get("message") or {}
         if msg.get("role") != "assistant":
             continue
+        turns += 1
         u = msg.get("usage") or {}
         if u:
             priced = True
@@ -145,7 +159,7 @@ def pi_answer_and_usage(stdout: str) -> tuple[str, dict, float | None]:
         texts = [p.get("text", "") for p in content if p.get("type") == "text"]
         if texts and not any(p.get("type") == "toolCall" for p in content):
             answer = "\n".join(texts)
-    return answer, (tokens if priced else {}), (round(cost, 6) if priced else None)
+    return answer, (tokens if priced else {}), (round(cost, 6) if priced else None), turns
 
 
 def classify(answer: str, trap_id: str) -> str:
@@ -179,6 +193,7 @@ def run_claude(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
             answer = payload.get("result", "")
             rec["cost_usd"] = payload.get("total_cost_usd")
             rec["tokens"] = claude_tokens(payload)
+            rec["turns"] = payload.get("num_turns")
         except (json.JSONDecodeError, AttributeError):
             answer = proc.stdout
         rec["verdict"] = classify(answer, trap_id) if answer.strip() else "error: empty"
@@ -201,6 +216,10 @@ def run_pi(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
             REPO / d, work / d,
             ignore=shutil.ignore_patterns("npm", "git", "node_modules"),
         )
+    if trap_id in SEED_TRAPS:
+        (work / "bench").mkdir()
+        for f in SEED_FILES:
+            shutil.copy2(REPO / f, work / f)
     subprocess.run(
         ("xorq", "catalog", "-p", str(work / ".xorq" / "catalog"), "init"),
         capture_output=True, check=True,
@@ -213,6 +232,13 @@ def run_pi(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
          "commit", "-qm", "trial fixture"),
         cwd=work, capture_output=True,
     )
+    # Seeded traps: put the reviewed semantic model into the fresh catalog
+    # before the agent starts (after the commit — builds record git state).
+    if trap_id in SEED_TRAPS:
+        subprocess.run(
+            ("bash", "bench/seed_semantic_catalog.sh", ".xorq/catalog"),
+            cwd=work, capture_output=True, check=True,
+        )
     cmd = ("pi", "-p", "--approve", "--no-session", "--mode", "json",
            "--model", model,
            *(("--thinking", thinking) if thinking else ()), prompt)
@@ -225,11 +251,13 @@ def run_pi(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
         (out_dir / f"pi-{idx:02d}.stdout").write_text(proc.stdout)
         (out_dir / f"pi-{idx:02d}.stderr").write_text(proc.stderr)
         text = proc.stdout
-        answer, tokens, cost = pi_answer_and_usage(text)
+        answer, tokens, cost, turns = pi_answer_and_usage(text)
         if tokens:
             rec["tokens"] = tokens
         if cost is not None:
             rec["cost_usd"] = cost
+        if turns:
+            rec["turns"] = turns
         rec["verdict"] = classify(answer, trap_id) if text.strip() else "error: empty"
         # The gate prepends its banner into the TERMINAL answer message, so read
         # it from the parsed answer — the raw event stream also contains
@@ -253,8 +281,9 @@ def summarize(records: list[dict], harness: str) -> list[str]:
     rows = [r for r in records if r["harness"] == harness]
     if not rows:
         return []
+    secs = sorted(r["seconds"] for r in rows)
     lines = [f"\n{harness} — {len(rows)} runs "
-             f"(median {sorted(r['seconds'] for r in rows)[len(rows) // 2]}s):"]
+             f"(median {secs[len(rows) // 2]}s, total {sum(secs):,.0f}s agent-time):"]
     counts: dict[str, int] = {}
     for r in rows:
         counts[r["verdict"]] = counts.get(r["verdict"], 0) + 1
@@ -264,6 +293,10 @@ def summarize(records: list[dict], harness: str) -> list[str]:
     if costs:
         lines.append(f"  cost: ${sum(costs):.2f} total over {len(costs)} priced runs "
                      f"(${sum(costs) / len(costs):.3f}/run)")
+    turns = sorted(r["turns"] for r in rows if r.get("turns") is not None)
+    if turns:
+        lines.append(f"  turns: {sum(turns):,} total over {len(turns)} runs "
+                     f"(median {turns[len(turns) // 2]})")
     toks = [r["tokens"] for r in rows if r.get("tokens")]
     if toks:
         tot = {k: sum(t[k] for t in toks) for k in ("input", "output", "cacheRead", "cacheWrite")}

@@ -8,11 +8,22 @@ produced from your own knowledge. You do not decide the verdict; the checker
 folds it.
 
 **Iron rule:** never state a number you did not obtain from `xorq_select` on a
-declared alias. Never fall back to raw `pandas`/`csv`/hand arithmetic. If the
-data you need has no alias, **ingest it into the catalog first** (build →
-`xorq catalog add`; see the xorq-catalog skill) and answer against the new
-alias. The real catalog is the directory `.xorq/catalog`; never hand-edit a
-`catalog.yaml`. If you cannot compute a figure from the catalog and verify it,
+declared alias. Never fall back to raw `pandas`/`csv`/hand arithmetic.
+**Before any ingest, orient:** run `xorq_semantic_models` and
+`xorq_catalog_list_aliases` FIRST, even when the question hands you source
+URLs — a URL in the prompt is not an instruction to ingest it. If a semantic
+model's measure matches the question, answer by querying that measure BY NAME
+(semantic-model skill) and do not ingest or re-derive anything. Only when no
+existing alias or measure covers the data do you **ingest it into the catalog**
+and answer against the new alias. The recipe (details in the xorq-catalog skill): write a
+build script under `.xorq/scripts/` — NEVER the repo root — using
+`xo.deferred_read_csv(url, con, storage_options=FrozenDict({"User-Agent": …}))`
+with a module-level `expr`; then `xorq build .xorq/scripts/<s>.py --builds-dir
+.xorq/builds --emit-build-path-to /tmp/bp.txt` and `xorq catalog -p
+.xorq/catalog add "$(cat /tmp/bp.txt)" -a <alias> --no-sync`. `catalog add`
+takes BUILD DIRECTORIES, never URLs — and run catalog writes ONE AT A TIME
+(two in parallel corrupt the catalog; see the skill for recovery). The real
+catalog is the directory `.xorq/catalog`; never hand-edit a `catalog.yaml`. If you cannot compute a figure from the catalog and verify it,
 present it as explicitly **UNVERIFIED** — never as confident fact.
 
 **The rule covers words, not just digits.** A superlative or ranking claim —
@@ -55,8 +66,12 @@ never pad a pre-rounded column with zeros.
 ## Procedure
 
 1. **Orient.** Use the catalog path in the task (default `.xorq/catalog`).
-   `xorq_catalog_list_aliases`, then `xorq_catalog_schema` on each alias you
-   will use. Compose only on declared aliases.
+   `xorq_semantic_models` FIRST — a semantic model's measures are reviewed
+   metric definitions, and when one matches the question you answer by
+   querying it BY NAME (`xorq_semantic_schema` lists the names; the
+   semantic-model skill has the full pattern) — never by re-deriving it.
+   Then `xorq_catalog_list_aliases` and `xorq_catalog_schema` on each alias
+   you will use. Compose only on declared aliases.
 
 2. **Compute** each value with `xorq_select`, composing on the bound table
    `source` (e.g. `source.order_by(source.n.desc()).limit(1).select('origin',
@@ -87,8 +102,12 @@ never pad a pre-rounded column with zeros.
 4. **Self-verify — cover every number you print.** Call `xorq_verify` once
    with `{ catalog_path, expressions, obligations, reply_values }`, where
    `reply_values` is every number in your answer (an uncovered value
-   downgrades the verdict). If an obligation is not `DISCHARGED`, fix its
-   predicate or retract the number and re-verify. **Also check the source:**
+   downgrades the verdict). EVERY figure in the final sentence needs its own
+   discharged obligation — supporting numbers included: "2.3237, from 7,942
+   markets and 341,784,857 residents" is THREE claims, not one. Declare the
+   supporting figures too (they are cheap scalars on the same alias), or
+   state only the headline value. If an obligation is not `DISCHARGED`, fix
+   its predicate or retract the number and re-verify. **Also check the source:**
    call `xorq_check_lineage(catalog_path, alias)` on every alias you produced
    or answered from; treat a non-`VERIFIED` lineage like an undischarged
    obligation — fix the ingestion or present the answer as UNVERIFIED. Pass

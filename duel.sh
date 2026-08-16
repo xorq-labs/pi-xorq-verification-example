@@ -14,6 +14,9 @@
 #
 #   ./duel.sh                    # default trap (denominator-us)
 #   ./duel.sh national-sum       # any id from: python bench/hallucination_prompts.py
+#   ./duel.sh denominator-us-semantic   # no scope hints in the prompt; the
+#                                # catalog is pre-seeded with the reviewed BSL
+#                                # semantic model (bench/bsl_us_markets.py)
 #
 # --no-claude drops the bare-agent pane: two panes, pi + the catalog TUI —
 # the harness-only view (watch the verification, no duel):
@@ -64,16 +67,27 @@ fi
 # Pick a trap by id; ids and oracles live in bench/hallucination_prompts.py.
 # The default is a cross-dataset ratio (markets total ÷ census US population):
 # it needs both files ingested and the metric composed as an expression, so the
-# whole verification pipeline is exercised — and the denominator has two
+# whole verification pipeline is exercised — and each side of the ratio has
 # tempting wrong readings that a bare agent falls into in provable ways.
 TRAP_ID="${TRAP_ID_ARG:-denominator-us}"
 if ! PROMPT="$(python bench/hallucination_prompts.py --duel "$TRAP_ID")"; then
   printf '%s\n' "$PROMPT" >&2  # on an unknown id, bench prints the valid ids
   exit 1
 fi
+# The semantic trap carries no scope hints in the prompt — the modeling lives
+# in the reviewed BSL model instead (bench/bsl_us_markets.py). Seed the fresh
+# catalog with the us_markets model before the TUI starts, and hold pi's
+# prompt until the alias exists so the agent never races the seed.
+SEED_CMD=""
+WAIT_ALIAS=""
+if [ "$TRAP_ID" = "denominator-us-semantic" ]; then
+  SEED_CMD="bench/seed_semantic_catalog.sh .xorq/catalog && "
+  WAIT_ALIAS="us_markets"
+fi
+
 # The TUI polls the catalog on an interval (default 10s); 2s keeps the right
 # pane tracking the agent's ingests and verify-<id> witnesses almost live.
-CATALOG_SETUP="rm -rf .xorq/ && mkdir .xorq && xorq catalog -p .xorq/catalog init && xorq catalog -p .xorq/catalog tui --refresh 2"
+CATALOG_SETUP="rm -rf .xorq/ && mkdir .xorq && xorq catalog -p .xorq/catalog init && ${SEED_CMD}xorq catalog -p .xorq/catalog tui --refresh 2"
 
 # Pre-authorize claude in its fresh dir so it never prompts for tool use —
 # no --dangerously-skip-permissions needed. The allow-list grants the built-in
@@ -161,6 +175,13 @@ tmux send-keys -t "$PANE_PI" "$PI_CMD" Enter
 {
   PREFIRE_WAIT=$(( BOOT_WAIT > CATALOG_WAIT ? BOOT_WAIT : CATALOG_WAIT ))
   sleep "$PREFIRE_WAIT"
+  # Seeded trap: don't type until the metric alias is actually in the catalog.
+  if [ -n "$WAIT_ALIAS" ]; then
+    for _ in $(seq 1 90); do
+      xorq catalog -p .xorq/catalog list-aliases 2>/dev/null | grep -q "$WAIT_ALIAS" && break
+      sleep 2
+    done
+  fi
   tmux send-keys -l -t "$PANE_PI" "$PROMPT"
   sleep 1
   tmux send-keys -t "$PANE_PI" Enter

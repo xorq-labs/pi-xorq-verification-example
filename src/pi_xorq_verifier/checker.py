@@ -82,6 +82,12 @@ class Predicate:
     # The population a superlative/count ranges over is NOT a separate field — it
     # lives in the obligation's `population` (a restriction of the alias), so the
     # judgment and its cross-check both derive from the one witness.
+    # Semantic-model claims: measures (and optional dimensions) BY NAME from the
+    # alias's own BSL model. When `measures` is set, the checker SYNTHESIZES the
+    # witness itself — source.ls.builder.query(dimensions=…, measures=…) — so a
+    # reviewed metric is declared, never hand-written (no `expression` needed).
+    measures: tuple[str, ...] = ()
+    dimensions: tuple[str, ...] = ()
     # table claims: the claimed grid compared against the witness result.
     columns: tuple[str, ...] = ()  # columns compared (and, for a ranking, display order)
     rows: tuple[tuple[tuple[str, str], ...], ...] = ()  # claimed rows as (col, value) pairs
@@ -660,8 +666,13 @@ def discharge(
     if not all(passed for _, passed in checks):
         # Name *why* it is ill-formed when we can, so a malformed obligation
         # self-corrects instead of dead-ending (the reason a run abandoned the
-        # table kind and fell back to weaker per-fact checks).
-        reason = witness.build_error(alias_expr, ob) if expr is None else ""
+        # table kind and fell back to weaker per-fact checks). A witness that
+        # BUILT but failed a check gets the check-level remedy instead.
+        reason = (
+            witness.build_error(alias_expr, ob)
+            if expr is None
+            else witness.check_hint(alias_expr, ob, checks)
+        )
         return ObligationResult(
             ob.id,
             ObligationStatus.COULD_NOT_DISCHARGE,
@@ -1054,6 +1065,12 @@ def obligation_from_dict(d: dict) -> Obligation:
     if isinstance(p_columns, str):
         p_columns = (p_columns,)
 
+    def _names(key: str) -> tuple[str, ...]:
+        v = p.get(key, ())
+        if isinstance(v, str):
+            v = (v,)
+        return tuple(str(x) for x in v)
+
     return Obligation(
         id=d["id"],
         kind=kind,
@@ -1068,6 +1085,8 @@ def obligation_from_dict(d: dict) -> Obligation:
             # reach the string-only op-tree checks (e.g. _is_circular's .strip()).
             entity_val=(None if p.get("entity_val") is None else str(p.get("entity_val"))),
             metric_col=p.get("metric_col"),
+            measures=_names("measures"),
+            dimensions=_names("dimensions"),
             columns=tuple(p_columns),
             rows=rows,
             ordered=bool(p.get("ordered", True)),
