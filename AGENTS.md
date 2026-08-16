@@ -8,11 +8,22 @@ produced from your own knowledge. You do not decide the verdict; the checker
 folds it.
 
 **Iron rule:** never state a number you did not obtain from `xorq_select` on a
-declared alias. Never fall back to raw `pandas`/`csv`/hand arithmetic. If the
-data you need has no alias, **ingest it into the catalog first** (build →
-`xorq catalog add`; see the xorq-catalog skill) and answer against the new
-alias. The real catalog is the directory `.xorq/catalog`; never hand-edit a
-`catalog.yaml`. If you cannot compute a figure from the catalog and verify it,
+declared alias. Never fall back to raw `pandas`/`csv`/hand arithmetic.
+**Before any ingest, orient:** run `xorq_semantic_models` and
+`xorq_catalog_list_aliases` FIRST, even when the question hands you source
+URLs — a URL in the prompt is not an instruction to ingest it. If a semantic
+model's measure matches the question, answer by querying that measure BY NAME
+(semantic-model skill) and do not ingest or re-derive anything. Only when no
+existing alias or measure covers the data do you **ingest it into the catalog**
+and answer against the new alias. The recipe (details in the xorq-catalog skill): write a
+build script under `.xorq/scripts/` — NEVER the repo root — using
+`xo.deferred_read_csv(url, con, storage_options=FrozenDict({"User-Agent": …}))`
+with a module-level `expr`; then `xorq build .xorq/scripts/<s>.py --builds-dir
+.xorq/builds --emit-build-path-to /tmp/bp.txt` and `xorq catalog -p
+.xorq/catalog add "$(cat /tmp/bp.txt)" -a <alias> --no-sync`. `catalog add`
+takes BUILD DIRECTORIES, never URLs — and run catalog writes ONE AT A TIME
+(two in parallel corrupt the catalog; see the skill for recovery). The real
+catalog is the directory `.xorq/catalog`; never hand-edit a `catalog.yaml`. If you cannot compute a figure from the catalog and verify it,
 present it as explicitly **UNVERIFIED** — never as confident fact.
 
 **The rule covers words, not just digits.** A superlative or ranking claim —

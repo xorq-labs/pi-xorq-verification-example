@@ -334,7 +334,28 @@ export default function (pi: ExtensionAPI) {
         { timeout: SHORT, signal },
       );
       if (r.code !== 0) throw new Error(`xorq catalog list-aliases: ${r.stderr}`);
-      return { content: [{ type: "text", text: r.stdout }] };
+      // Surface semantic models WHERE the agent already looks: annotate each
+      // tagged alias inline so model discovery never depends on remembering
+      // to call xorq_semantic_models first.
+      const lines: string[] = [];
+      let sawModel = false;
+      for (const raw of r.stdout.split("\n")) {
+        const alias = raw.trim().split(/\s+/)[0];
+        if (alias && !isWitnessAlias(alias)) {
+          const tm = await cachedBslTag(params.catalog_path, alias, signal);
+          if (tm) {
+            sawModel = true;
+            lines.push(`${raw}   ← SEMANTIC MODEL (measures: ${pairNames(tm.measures).join(", ")})`);
+            continue;
+          }
+        }
+        lines.push(raw);
+      }
+      const footer = sawModel
+        ? "\nA semantic model's measures are reviewed metric definitions — read them by " +
+          "name with xorq_semantic_select (schema via xorq_semantic_schema); never re-derive them.\n"
+        : "";
+      return { content: [{ type: "text", text: lines.join("\n") + footer }] };
     },
   });
 
@@ -378,7 +399,20 @@ export default function (pi: ExtensionAPI) {
         { timeout: SHORT, signal },
       );
       if (r.code !== 0) throw new Error(`xorq catalog schema: ${r.stderr}`);
-      return { content: [{ type: "text", text: r.stdout }] };
+      // The observed wrong turn: an agent reads a semantic alias's raw columns
+      // here, concludes "the data is already combined", and hand-aggregates.
+      // Say what the alias IS at the moment the plan is being formed.
+      let note = "";
+      if (!isWitnessAlias(params.alias)) {
+        const tm = await cachedBslTag(params.catalog_path, params.alias, signal);
+        if (tm)
+          note =
+            `\nThis alias is a SEMANTIC MODEL (${tm.name}) — the columns above are its raw ` +
+            `base, but the reviewed definitions are its measures: ` +
+            `${pairNames(tm.measures).join(", ")} (dimensions: ${pairNames(tm.dimensions).join(", ")}). ` +
+            `Read them by name with xorq_semantic_select; do NOT re-derive them from the raw columns.\n`;
+      }
+      return { content: [{ type: "text", text: r.stdout + note }] };
     },
   });
 
@@ -403,6 +437,21 @@ export default function (pi: ExtensionAPI) {
     }
     return null;
   }
+  // Positive tag lookups are cached per (catalog, alias): a model, once
+  // present under an alias, stays a model for the session, and the lookup
+  // rides on tools that fire on every turn (list-aliases, schema, select).
+  // Negative results are NOT cached — an alias can gain a model mid-session.
+  const bslTagCache = new Map<string, any>();
+  async function cachedBslTag(catalogPath: string, alias: string, signal?: AbortSignal) {
+    const key = `${catalogPath} ${alias}`;
+    if (bslTagCache.has(key)) return bslTagCache.get(key);
+    const tm = await bslTag(catalogPath, alias, signal);
+    if (tm) bslTagCache.set(key, tm);
+    return tm;
+  }
+  // The harness's own persisted witnesses (verify-<id>) are composed FROM
+  // tagged models and inherit the tag — they are not models to answer from.
+  const isWitnessAlias = (a: string) => a.startsWith("verify-");
   // tag metadata lists dims/measures as [name, [[key, value], …]] pairs
   const pairNames = (pairs: any): string[] =>
     Array.isArray(pairs) ? pairs.map((p: any) => (Array.isArray(p) ? String(p[0]) : String(p))) : [];
@@ -435,7 +484,10 @@ export default function (pi: ExtensionAPI) {
         .filter(Boolean);
       const models: any[] = [];
       for (const alias of aliases) {
-        const tm = await bslTag(params.catalog_path, alias, signal);
+        // Persisted verify-<id> witnesses inherit the model's tag (they are
+        // composed from it) — list the models, not the harness's own receipts.
+        if (isWitnessAlias(alias)) continue;
+        const tm = await cachedBslTag(params.catalog_path, alias, signal);
         if (tm)
           models.push({
             alias,
@@ -618,9 +670,20 @@ export default function (pi: ExtensionAPI) {
       const r = await pi.exec(cmd, argv, { timeout: LONG, signal });
       if (r.code !== 0) throw new Error(`xorq_select: ${r.stderr}`);
       const capped = n > 0 && !/\.limit\s*\(/.test(params.compose);
-      const note = capped
+      let note = capped
         ? `\n(showing up to ${n} rows; pass limit or aggregate to count — do not page)`
         : "";
+      // A hand-written compose on a semantic-model alias SUCCEEDS silently —
+      // and then its derived value fails selection_only at verify time. Warn
+      // at the moment of success, not at the moment of failure.
+      if (!isWitnessAlias(params.on) && !params.compose.includes("ls.builder")) {
+        const tm = await cachedBslTag(params.catalog_path, params.on, signal);
+        if (tm)
+          note +=
+            `\nnote: '${params.on}' is a SEMANTIC MODEL — values derived by hand from its raw ` +
+            `columns will fail verification (selection_only). Use its reviewed measures ` +
+            `(${pairNames(tm.measures).join(", ")}) via xorq_semantic_select instead.`;
+      }
       return { content: [{ type: "text", text: r.stdout + note }] };
     },
   });

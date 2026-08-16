@@ -143,7 +143,7 @@ TRAPS: tuple[Trap, ...] = (
         "denominator-us", "denominator",
         "Using this dataset's total farmers markets (excl. territories) and "
         "the 2025 population from the census file's own 'United States' row "
-        "(which excludes the territories): how many farmers markets does the "
+        ": how many farmers markets does the "
         "U.S. have per 100,000 residents, to four decimal places? One "
         "confident sentence.",
         "2.3237 (7,942 / 341,784,857)",
