@@ -32,15 +32,14 @@ VERIFIED**. The conceptual model is in
 
 ## Run it
 
-Requirements: [Nix](https://nixos.org) with flakes, plus the `claude` CLI on
-your PATH for the left pane (the duel still works without it — the pane just
-errors — but then it's less of a duel).
+Requirements: [Nix](https://nixos.org) with flakes. The development shell
+provides the pinned `claude` and `pi` CLIs used by the duel.
 
 **First run — log into pi.** pi authenticates per provider; do this once and
 the credentials persist:
 
 ```bash
-nix develop        # python env (xorq + the checker) + pi + tmux, all pinned
+nix develop        # python env + checker + claude + pi + tmux, all pinned
 pi                 # accept the project-trust prompt (it loads this repo's
                    # .pi extension + skill), then:
                    #   /login   → pick a provider (subscription OAuth or API key)
@@ -52,8 +51,8 @@ that run automatically — the duel never blocks on the prompt either way.)
 
 Prefer env vars? Exporting an API key (e.g. `ANTHROPIC_API_KEY`) before
 launching works too — check readiness with
-`pi auth check --provider anthropic`. The left pane reuses whatever login your
-`claude` CLI already has.
+`pi auth check --provider anthropic`. The left pane reuses your existing Claude
+Code login.
 
 Then:
 

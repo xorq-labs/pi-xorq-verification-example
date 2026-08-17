@@ -21,6 +21,12 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Claude Code: pin the CLI used by the benchmark for reproducible runs.
+    claude-code = {
+      url = "github:sadjow/claude-code-nix/v2.1.233";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -29,6 +35,7 @@
       pyproject-nix,
       uv2nix,
       pyproject-build-systems,
+      claude-code,
       ...
     }:
     let
@@ -112,6 +119,7 @@
             packages = [
               virtualenv
               piPackages.${system}
+              claude-code.packages.${system}.default
               pkgs.uv
               # duel.sh drives the three panes with tmux
               pkgs.tmux
