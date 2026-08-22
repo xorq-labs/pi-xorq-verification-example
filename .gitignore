@@ -19,8 +19,10 @@ node_modules/
 .xorq/
 builds/
 
-# per-machine trial artifacts (bench/trial_runs.py)
-bench/trials/
+# per-machine trial artifacts (bench/trial_runs.py) — except the isolated
+# n=100 runs behind the blog post's table (see bench/trials/blog/MANIFEST.md)
+bench/trials/*
+!bench/trials/blog/
 
 # raw recordings (record.sh) — only the rendered README gif is tracked
 *.cast

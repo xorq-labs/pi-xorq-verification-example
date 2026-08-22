@@ -1,0 +1,1702 @@
+[
+  {
+    "harness": "pi",
+    "run": 1,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1083,
+      "cacheRead": 26463,
+      "cacheWrite": 9980
+    },
+    "cost_usd": 0.020586,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "orq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents. (Verified via `verify-markets_per_100k`; sources: https://harvestlymarkets.com/data/us-farmers-markets-by-state-2026.csv and https://gist.githubusercontent.com/hussainsultan/369600f5179b22792a2b4c9ed37de056/raw/NST-EST2025-ALLDATA.csv)",
+    "seconds": 20.8
+  },
+  {
+    "harness": "pi",
+    "run": 2,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1100,
+      "cacheRead": 26375,
+      "cacheWrite": 9831
+    },
+    "cost_usd": 0.020474,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.9
+  },
+  {
+    "harness": "pi",
+    "run": 3,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1054,
+      "cacheRead": 36111,
+      "cacheWrite": 10058
+    },
+    "cost_usd": 0.021514,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 25.9
+  },
+  {
+    "harness": "pi",
+    "run": 4,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 72,
+      "output": 1723,
+      "cacheRead": 45958,
+      "cacheWrite": 10942
+    },
+    "cost_usd": 0.02696,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 585caf\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents based on 7,942 total farmers markets and a population of 341,784,857.",
+    "seconds": 32.7
+  },
+  {
+    "harness": "pi",
+    "run": 5,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1099,
+      "cacheRead": 26411,
+      "cacheWrite": 9849
+    },
+    "cost_usd": 0.020495,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verified against the semantic model).",
+    "seconds": 21.0
+  },
+  {
+    "harness": "pi",
+    "run": 6,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1462,
+      "cacheRead": 46094,
+      "cacheWrite": 10562
+    },
+    "cost_usd": 0.025195,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 28.4
+  },
+  {
+    "harness": "pi",
+    "run": 7,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 999,
+      "cacheRead": 26477,
+      "cacheWrite": 9766
+    },
+    "cost_usd": 0.019898,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.2
+  },
+  {
+    "harness": "pi",
+    "run": 8,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 924,
+      "cacheRead": 26390,
+      "cacheWrite": 9685
+    },
+    "cost_usd": 0.019413,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 19.3
+  },
+  {
+    "harness": "pi",
+    "run": 9,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1098,
+      "cacheRead": 26545,
+      "cacheWrite": 9869
+    },
+    "cost_usd": 0.020529,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, based on the verified semantic model `verify-markets_per_100k`.",
+    "seconds": 20.1
+  },
+  {
+    "harness": "pi",
+    "run": 10,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1166,
+      "cacheRead": 26504,
+      "cacheWrite": 9940
+    },
+    "cost_usd": 0.020953,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k_us).",
+    "seconds": 20.2
+  },
+  {
+    "harness": "pi",
+    "run": 11,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1149,
+      "cacheRead": 36113,
+      "cacheWrite": 10158
+    },
+    "cost_usd": 0.022114,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 19.9
+  },
+  {
+    "harness": "pi",
+    "run": 12,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 857,
+      "cacheRead": 26360,
+      "cacheWrite": 9631
+    },
+    "cost_usd": 0.019008,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verified with reference verify-farmers_markets_per_100k).",
+    "seconds": 16.9
+  },
+  {
+    "harness": "pi",
+    "run": 13,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1155,
+      "cacheRead": 36505,
+      "cacheWrite": 10240
+    },
+    "cost_usd": 0.022285,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 25.7
+  },
+  {
+    "harness": "pi",
+    "run": 14,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1003,
+      "cacheRead": 26464,
+      "cacheWrite": 9783
+    },
+    "cost_usd": 0.019938,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has **2.3237 farmers markets per 100,000 residents** (verify-farmers_markets_per_100k).",
+    "seconds": 20.0
+  },
+  {
+    "harness": "pi",
+    "run": 15,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1041,
+      "cacheRead": 26432,
+      "cacheWrite": 9984
+    },
+    "cost_usd": 0.020378,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 21185b\u2026).\n\n\nThe United States has **2.3237 farmers markets per 100,000 residents**, verified against both the farmers markets and census datasets (verify-markets_per_100k_us_total).",
+    "seconds": 20.1
+  },
+  {
+    "harness": "pi",
+    "run": 16,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1070,
+      "cacheRead": 36201,
+      "cacheWrite": 10056
+    },
+    "cost_usd": 0.0216,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 20.8
+  },
+  {
+    "harness": "pi",
+    "run": 17,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1115,
+      "cacheRead": 26501,
+      "cacheWrite": 10083
+    },
+    "cost_usd": 0.020879,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 68eee1\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified against the reviewed semantic model combining the farmers markets and census datasets.",
+    "seconds": 21.8
+  },
+  {
+    "harness": "pi",
+    "run": 18,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 63,
+      "output": 1264,
+      "cacheRead": 36599,
+      "cacheWrite": 10394
+    },
+    "cost_usd": 0.023035,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 21.6
+  },
+  {
+    "harness": "pi",
+    "run": 19,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1250,
+      "cacheRead": 27148,
+      "cacheWrite": 10336
+    },
+    "cost_usd": 0.021935,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified against the national farmers markets and census datasets (verify-markets_per_100k).",
+    "seconds": 25.4
+  },
+  {
+    "harness": "pi",
+    "run": 20,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1305,
+      "cacheRead": 36120,
+      "cacheWrite": 10184
+    },
+    "cost_usd": 0.022928,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 24.3
+  },
+  {
+    "harness": "pi",
+    "run": 21,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1239,
+      "cacheRead": 26596,
+      "cacheWrite": 10130
+    },
+    "cost_usd": 0.021567,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 21.4
+  },
+  {
+    "harness": "pi",
+    "run": 22,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 883,
+      "cacheRead": 26398,
+      "cacheWrite": 9668
+    },
+    "cost_usd": 0.019188,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents. (Verified via witness verify-markets_per_100k)",
+    "seconds": 19.6
+  },
+  {
+    "harness": "pi",
+    "run": 23,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 897,
+      "cacheRead": 26339,
+      "cacheWrite": 9657
+    },
+    "cost_usd": 0.019238,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237 farmers markets per 100,000 residents**, verified by the reviewed measure on the semantic model (witness: verify-markets_per_100k).",
+    "seconds": 19.0
+  },
+  {
+    "harness": "pi",
+    "run": 24,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1449,
+      "cacheRead": 46466,
+      "cacheWrite": 10574
+    },
+    "cost_usd": 0.025182,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has **2.3237 farmers markets per 100,000 residents**, verified by the reviewed semantic model combining the farmers markets and census datasets.",
+    "seconds": 25.0
+  },
+  {
+    "harness": "pi",
+    "run": 25,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1472,
+      "cacheRead": 36304,
+      "cacheWrite": 10377
+    },
+    "cost_usd": 0.024023,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237 farmers markets per 100,000 residents** (verified via `verify-farmers_markets_per_100k`).",
+    "seconds": 25.7
+  },
+  {
+    "harness": "pi",
+    "run": 26,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1353,
+      "cacheRead": 36235,
+      "cacheWrite": 10300
+    },
+    "cost_usd": 0.023324,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k_us).",
+    "seconds": 22.0
+  },
+  {
+    "harness": "pi",
+    "run": 27,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1071,
+      "cacheRead": 36093,
+      "cacheWrite": 10059
+    },
+    "cost_usd": 0.021598,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 20.6
+  },
+  {
+    "harness": "pi",
+    "run": 28,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 945,
+      "cacheRead": 26397,
+      "cacheWrite": 9688
+    },
+    "cost_usd": 0.019523,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, verified by the catalog's reviewed semantic model (witness: verify-markets_per_100k_us).",
+    "seconds": 18.2
+  },
+  {
+    "harness": "pi",
+    "run": 29,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1328,
+      "cacheRead": 36966,
+      "cacheWrite": 10372
+    },
+    "cost_usd": 0.023362,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 21.8
+  },
+  {
+    "harness": "pi",
+    "run": 30,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1405,
+      "cacheRead": 36467,
+      "cacheWrite": 10339
+    },
+    "cost_usd": 0.023655,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 21.9
+  },
+  {
+    "harness": "pi",
+    "run": 31,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 959,
+      "cacheRead": 26459,
+      "cacheWrite": 9750
+    },
+    "cost_usd": 0.019676,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 19.3
+  },
+  {
+    "harness": "pi",
+    "run": 32,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 964,
+      "cacheRead": 35750,
+      "cacheWrite": 9929
+    },
+    "cost_usd": 0.020866,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verified via `verify-markets_per_100k`).",
+    "seconds": 19.5
+  },
+  {
+    "harness": "pi",
+    "run": 33,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1281,
+      "cacheRead": 36562,
+      "cacheWrite": 10363
+    },
+    "cost_usd": 0.023075,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 23.1
+  },
+  {
+    "harness": "pi",
+    "run": 34,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 982,
+      "cacheRead": 26412,
+      "cacheWrite": 9769
+    },
+    "cost_usd": 0.01981,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 7fe5d1\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verified by the reviewed semantic model measure).",
+    "seconds": 20.9
+  },
+  {
+    "harness": "pi",
+    "run": 35,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1428,
+      "cacheRead": 36802,
+      "cacheWrite": 10436
+    },
+    "cost_usd": 0.023926,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, verified through the reviewed measure in the semantic catalog.",
+    "seconds": 25.8
+  },
+  {
+    "harness": "pi",
+    "run": 36,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1120,
+      "cacheRead": 36261,
+      "cacheWrite": 10118
+    },
+    "cost_usd": 0.021934,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.5
+  },
+  {
+    "harness": "pi",
+    "run": 37,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 908,
+      "cacheRead": 26399,
+      "cacheWrite": 9661
+    },
+    "cost_usd": 0.019304,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, verified by the reviewed `us_markets` semantic model (witness: verify-markets_per_100k).",
+    "seconds": 16.2
+  },
+  {
+    "harness": "pi",
+    "run": 38,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1085,
+      "cacheRead": 26611,
+      "cacheWrite": 9872
+    },
+    "cost_usd": 0.020474,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has **2.3237 farmers markets per 100,000 residents**.",
+    "seconds": 20.4
+  },
+  {
+    "harness": "pi",
+    "run": 39,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 945,
+      "cacheRead": 26499,
+      "cacheWrite": 9727
+    },
+    "cost_usd": 0.019582,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-farmers_markets_per_100k).",
+    "seconds": 18.9
+  },
+  {
+    "harness": "pi",
+    "run": 40,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1279,
+      "cacheRead": 26748,
+      "cacheWrite": 10084
+    },
+    "cost_usd": 0.021723,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 22.5
+  },
+  {
+    "harness": "pi",
+    "run": 41,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1201,
+      "cacheRead": 26492,
+      "cacheWrite": 10157
+    },
+    "cost_usd": 0.0214,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog d3e9af\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.6
+  },
+  {
+    "harness": "pi",
+    "run": 42,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1113,
+      "cacheRead": 26355,
+      "cacheWrite": 9898
+    },
+    "cost_usd": 0.020621,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verified via `verify-markets_per_100k`).",
+    "seconds": 18.7
+  },
+  {
+    "harness": "pi",
+    "run": 43,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 889,
+      "cacheRead": 26385,
+      "cacheWrite": 9658
+    },
+    "cost_usd": 0.019204,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has approximately 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 18.0
+  },
+  {
+    "harness": "pi",
+    "run": 44,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 969,
+      "cacheRead": 26372,
+      "cacheWrite": 9774
+    },
+    "cost_usd": 0.019748,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 7fe5d1\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 18.5
+  },
+  {
+    "harness": "pi",
+    "run": 45,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1349,
+      "cacheRead": 36408,
+      "cacheWrite": 10321
+    },
+    "cost_usd": 0.023347,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 23.1
+  },
+  {
+    "harness": "pi",
+    "run": 46,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1097,
+      "cacheRead": 27101,
+      "cacheWrite": 10217
+    },
+    "cost_usd": 0.021016,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified through the semantic model's reviewed measure on the complete dataset.",
+    "seconds": 22.3
+  },
+  {
+    "harness": "pi",
+    "run": 47,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1188,
+      "cacheRead": 36450,
+      "cacheWrite": 10160
+    },
+    "cost_usd": 0.022345,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k_national).",
+    "seconds": 21.0
+  },
+  {
+    "harness": "pi",
+    "run": 48,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 62,
+      "output": 1265,
+      "cacheRead": 36258,
+      "cacheWrite": 10416
+    },
+    "cost_usd": 0.023033,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 24.3
+  },
+  {
+    "harness": "pi",
+    "run": 49,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1204,
+      "cacheRead": 36082,
+      "cacheWrite": 10198
+    },
+    "cost_usd": 0.022436,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 27.1
+  },
+  {
+    "harness": "pi",
+    "run": 50,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 908,
+      "cacheRead": 26389,
+      "cacheWrite": 9668
+    },
+    "cost_usd": 0.019312,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k, sha256:7a790a87a435b38e).",
+    "seconds": 20.0
+  },
+  {
+    "harness": "pi",
+    "run": 51,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1237,
+      "cacheRead": 26741,
+      "cacheWrite": 10280
+    },
+    "cost_usd": 0.021759,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 68eee1\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.5
+  },
+  {
+    "harness": "pi",
+    "run": 52,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 996,
+      "cacheRead": 35869,
+      "cacheWrite": 9951
+    },
+    "cost_usd": 0.021066,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents, verified against the reviewed semantic model (witness verify-markets_per_100k).",
+    "seconds": 21.4
+  },
+  {
+    "harness": "pi",
+    "run": 53,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 958,
+      "cacheRead": 35322,
+      "cacheWrite": 9821
+    },
+    "cost_usd": 0.020659,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verified via `verify-markets_per_100k`).",
+    "seconds": 22.3
+  },
+  {
+    "harness": "pi",
+    "run": 54,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1048,
+      "cacheRead": 26416,
+      "cacheWrite": 9815
+    },
+    "cost_usd": 0.020198,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 20.3
+  },
+  {
+    "harness": "pi",
+    "run": 55,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 46,
+      "output": 879,
+      "cacheRead": 26113,
+      "cacheWrite": 9538
+    },
+    "cost_usd": 0.018975,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified against the reviewed semantic model that integrates the farmers markets and census data.",
+    "seconds": 19.3
+  },
+  {
+    "harness": "pi",
+    "run": 56,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1024,
+      "cacheRead": 35795,
+      "cacheWrite": 9996
+    },
+    "cost_usd": 0.021254,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verified via `verify-markets_per_100k_us`).",
+    "seconds": 19.8
+  },
+  {
+    "harness": "pi",
+    "run": 57,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1098,
+      "cacheRead": 26745,
+      "cacheWrite": 9986
+    },
+    "cost_usd": 0.020695,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 18.3
+  },
+  {
+    "harness": "pi",
+    "run": 58,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1085,
+      "cacheRead": 36131,
+      "cacheWrite": 10020
+    },
+    "cost_usd": 0.021624,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 20.5
+  },
+  {
+    "harness": "pi",
+    "run": 59,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 85,
+      "output": 1417,
+      "cacheRead": 54491,
+      "cacheWrite": 10384
+    },
+    "cost_usd": 0.025599,
+    "turns": 7,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 25.3
+  },
+  {
+    "harness": "pi",
+    "run": 60,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1147,
+      "cacheRead": 35910,
+      "cacheWrite": 10062
+    },
+    "cost_usd": 0.021965,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-farmers_markets_per_100k).",
+    "seconds": 22.6
+  },
+  {
+    "harness": "pi",
+    "run": 61,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1191,
+      "cacheRead": 45679,
+      "cacheWrite": 10298
+    },
+    "cost_usd": 0.023468,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 23.0
+  },
+  {
+    "harness": "pi",
+    "run": 62,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 62,
+      "output": 1347,
+      "cacheRead": 36516,
+      "cacheWrite": 10580
+    },
+    "cost_usd": 0.023674,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog fb4038\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified against the official farmers markets dataset and census population data (verify-farmers_market_rate).",
+    "seconds": 22.1
+  },
+  {
+    "harness": "pi",
+    "run": 63,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1495,
+      "cacheRead": 46428,
+      "cacheWrite": 10625
+    },
+    "cost_usd": 0.025472,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 27.7
+  },
+  {
+    "harness": "pi",
+    "run": 64,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1111,
+      "cacheRead": 36563,
+      "cacheWrite": 10179
+    },
+    "cost_usd": 0.021995,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, according to the reviewed semantic model combining the farmers markets and census data.",
+    "seconds": 21.5
+  },
+  {
+    "harness": "pi",
+    "run": 65,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1216,
+      "cacheRead": 26553,
+      "cacheWrite": 9921
+    },
+    "cost_usd": 0.021185,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-farmers_markets_per_100k).",
+    "seconds": 21.5
+  },
+  {
+    "harness": "pi",
+    "run": 66,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 879,
+      "cacheRead": 26414,
+      "cacheWrite": 9676
+    },
+    "cost_usd": 0.019179,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 17.7
+  },
+  {
+    "harness": "pi",
+    "run": 67,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1246,
+      "cacheRead": 36254,
+      "cacheWrite": 10163
+    },
+    "cost_usd": 0.02262,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verified against a reviewed semantic model combining the farmers markets and census data sources).",
+    "seconds": 22.0
+  },
+  {
+    "harness": "pi",
+    "run": 68,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 926,
+      "cacheRead": 26425,
+      "cacheWrite": 9695
+    },
+    "cost_usd": 0.019439,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents, verified against the semantic model of farmers market and census data (verify-farmers_markets_per_100k).",
+    "seconds": 19.6
+  },
+  {
+    "harness": "pi",
+    "run": 69,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 62,
+      "output": 1440,
+      "cacheRead": 36579,
+      "cacheWrite": 10671
+    },
+    "cost_usd": 0.024259,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 68eee1\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents. (Verified via witness verify-markets_per_100k_us against reviewed semantic model combining the provided farmers markets and census data sources.)",
+    "seconds": 24.9
+  },
+  {
+    "harness": "pi",
+    "run": 70,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1207,
+      "cacheRead": 26655,
+      "cacheWrite": 9965
+    },
+    "cost_usd": 0.021205,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 20.0
+  },
+  {
+    "harness": "pi",
+    "run": 71,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 925,
+      "cacheRead": 26407,
+      "cacheWrite": 9699
+    },
+    "cost_usd": 0.019437,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog a4d5d6\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-farmers_per_100k).",
+    "seconds": 19.9
+  },
+  {
+    "harness": "pi",
+    "run": 72,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1498,
+      "cacheRead": 46943,
+      "cacheWrite": 10675
+    },
+    "cost_usd": 0.025601,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, based on the verified semantic model combining the farmers markets inventory and 2025 census population estimates (verify-markets_per_100k).",
+    "seconds": 27.4
+  },
+  {
+    "harness": "pi",
+    "run": 73,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1362,
+      "cacheRead": 46482,
+      "cacheWrite": 10569
+    },
+    "cost_usd": 0.024742,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 68eee1\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k_us).",
+    "seconds": 23.9
+  },
+  {
+    "harness": "pi",
+    "run": 74,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1093,
+      "cacheRead": 26778,
+      "cacheWrite": 10125
+    },
+    "cost_usd": 0.020849,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 19.5
+  },
+  {
+    "harness": "pi",
+    "run": 75,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 52,
+      "output": 1222,
+      "cacheRead": 27050,
+      "cacheWrite": 10500
+    },
+    "cost_usd": 0.021992,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, verified from the combined farmers markets and 2025 census data. \u2705",
+    "seconds": 21.2
+  },
+  {
+    "harness": "pi",
+    "run": 76,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 62,
+      "output": 1216,
+      "cacheRead": 36096,
+      "cacheWrite": 10342
+    },
+    "cost_usd": 0.022679,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, according to the 2026 farmers markets dataset and 2025 census estimates.",
+    "seconds": 22.3
+  },
+  {
+    "harness": "pi",
+    "run": 77,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1016,
+      "cacheRead": 35891,
+      "cacheWrite": 9989
+    },
+    "cost_usd": 0.021215,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237 farmers markets per 100,000 residents** (verify-markets_per_100k).",
+    "seconds": 19.9
+  },
+  {
+    "harness": "pi",
+    "run": 78,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1264,
+      "cacheRead": 26690,
+      "cacheWrite": 10221
+    },
+    "cost_usd": 0.021815,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog d3e9af\u2026).\n\n\nThe United States has **2.3237 farmers markets per 100,000 residents**, verified against the joined farmers markets and census datasets (verify-markets_per_100k_national).",
+    "seconds": 20.4
+  },
+  {
+    "harness": "pi",
+    "run": 79,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1095,
+      "cacheRead": 26709,
+      "cacheWrite": 9858
+    },
+    "cost_usd": 0.020516,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 19.2
+  },
+  {
+    "harness": "pi",
+    "run": 80,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 61,
+      "output": 1305,
+      "cacheRead": 36071,
+      "cacheWrite": 10233
+    },
+    "cost_usd": 0.022984,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 24.3
+  },
+  {
+    "harness": "pi",
+    "run": 81,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1090,
+      "cacheRead": 26627,
+      "cacheWrite": 9825
+    },
+    "cost_usd": 0.020442,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-farmers_markets_per_100k).",
+    "seconds": 22.2
+  },
+  {
+    "harness": "pi",
+    "run": 82,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1312,
+      "cacheRead": 36229,
+      "cacheWrite": 10275
+    },
+    "cost_usd": 0.023087,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 124230\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents, verified by witness `verify-us_farmers_markets_per_100k`.",
+    "seconds": 21.6
+  },
+  {
+    "harness": "pi",
+    "run": 83,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 957,
+      "cacheRead": 26549,
+      "cacheWrite": 9736
+    },
+    "cost_usd": 0.019658,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 20.9
+  },
+  {
+    "harness": "pi",
+    "run": 84,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1036,
+      "cacheRead": 26420,
+      "cacheWrite": 9806
+    },
+    "cost_usd": 0.020127,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 21.3
+  },
+  {
+    "harness": "pi",
+    "run": 85,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 882,
+      "cacheRead": 26401,
+      "cacheWrite": 9655
+    },
+    "cost_usd": 0.019167,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents, verified by `verify-markets_per_100k`.",
+    "seconds": 18.7
+  },
+  {
+    "harness": "pi",
+    "run": 86,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1034,
+      "cacheRead": 26526,
+      "cacheWrite": 9777
+    },
+    "cost_usd": 0.020092,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents, verified against the integrated datasets of total farmers markets and census population (verify-markets_per_100k).",
+    "seconds": 20.2
+  },
+  {
+    "harness": "pi",
+    "run": 87,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1099,
+      "cacheRead": 26407,
+      "cacheWrite": 10069
+    },
+    "cost_usd": 0.020772,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 19.5
+  },
+  {
+    "harness": "pi",
+    "run": 88,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1140,
+      "cacheRead": 26463,
+      "cacheWrite": 9891
+    },
+    "cost_usd": 0.020758,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 68eee1\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents, verified through the reviewed measure on the semantic model (verify-markets_per_100k_us).",
+    "seconds": 20.3
+  },
+  {
+    "harness": "pi",
+    "run": 89,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 992,
+      "cacheRead": 26839,
+      "cacheWrite": 10026
+    },
+    "cost_usd": 0.020226,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has approximately **2.3237 farmers markets per 100,000 residents**, based on the reviewed semantic model combining the farmers markets and census data.",
+    "seconds": 21.8
+  },
+  {
+    "harness": "pi",
+    "run": 90,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1099,
+      "cacheRead": 26484,
+      "cacheWrite": 9834
+    },
+    "cost_usd": 0.020484,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 22.3
+  },
+  {
+    "harness": "pi",
+    "run": 91,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1385,
+      "cacheRead": 46027,
+      "cacheWrite": 10446
+    },
+    "cost_usd": 0.024658,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog d3e9af\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k_national).",
+    "seconds": 23.1
+  },
+  {
+    "harness": "pi",
+    "run": 92,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 891,
+      "cacheRead": 26334,
+      "cacheWrite": 9654
+    },
+    "cost_usd": 0.019204,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 0b8aa1\u2026).\n\n\nThe U.S. has **2.3237 farmers markets per 100,000 residents** (verify-markets_per_100k_final).",
+    "seconds": 21.6
+  },
+  {
+    "harness": "pi",
+    "run": 93,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 1327,
+      "cacheRead": 26654,
+      "cacheWrite": 10265
+    },
+    "cost_usd": 0.022182,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged and its source lineage checked (catalog 7fe5d1\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k_total).",
+    "seconds": 20.6
+  },
+  {
+    "harness": "pi",
+    "run": 94,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1580,
+      "cacheRead": 36556,
+      "cacheWrite": 10564
+    },
+    "cost_usd": 0.024821,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog d3e9af\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 24.7
+  },
+  {
+    "harness": "pi",
+    "run": 95,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 73,
+      "output": 1274,
+      "cacheRead": 45792,
+      "cacheWrite": 10379
+    },
+    "cost_usd": 0.023996,
+    "turns": 6,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has **2.3237** farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 25.2
+  },
+  {
+    "harness": "pi",
+    "run": 96,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1420,
+      "cacheRead": 36372,
+      "cacheWrite": 10395
+    },
+    "cost_usd": 0.023791,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe U.S. has **2.3237** farmers markets per 100,000 residents.",
+    "seconds": 234.1
+  },
+  {
+    "harness": "pi",
+    "run": 97,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1006,
+      "cacheRead": 35961,
+      "cacheWrite": 10007
+    },
+    "cost_usd": 0.021195,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 316.1
+  },
+  {
+    "harness": "pi",
+    "run": 98,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 60,
+      "output": 1231,
+      "cacheRead": 36514,
+      "cacheWrite": 10300
+    },
+    "cost_usd": 0.022741,
+    "turns": 5,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents.",
+    "seconds": 520.7
+  },
+  {
+    "harness": "pi",
+    "run": 99,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 50,
+      "output": 932,
+      "cacheRead": 26630,
+      "cacheWrite": 9955
+    },
+    "cost_usd": 0.019817,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog 9e8bfa\u2026).\n\n\nThe U.S. has 2.3237 farmers markets per 100,000 residents (verify-markets_per_100k).",
+    "seconds": 493.6
+  },
+  {
+    "harness": "pi",
+    "run": 100,
+    "model": "anthropic/claude-haiku-4-5",
+    "tokens": {
+      "input": 48,
+      "output": 1091,
+      "cacheRead": 26668,
+      "cacheWrite": 9950
+    },
+    "cost_usd": 0.020607,
+    "turns": 4,
+    "verdict": "right",
+    "banner": "verified",
+    "answer": "\u27e6xorq-checker\u27e7 \u2705 VERIFIED \u2014 every figure discharged (catalog aca427\u2026).\n\n\nThe United States has 2.3237 farmers markets per 100,000 residents (verify-farmers_markets_per_100k).",
+    "seconds": 199.6
+  }
+]

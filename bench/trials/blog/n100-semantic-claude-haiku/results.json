@@ -1,0 +1,1602 @@
+[
+  {
+    "harness": "claude",
+    "run": 1,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06656709999999999,
+    "tokens": {
+      "input": 29234,
+      "output": 1245,
+      "cacheRead": 130041,
+      "cacheWrite": 9052
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "Based on the 2026 farmers markets dataset (8,867 total markets) and the 2020 census data (331,578,104 US residents), the United States has 2.6742 farmers markets per 100,000 residents.",
+    "seconds": 15.5
+  },
+  {
+    "harness": "claude",
+    "run": 2,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0681664,
+    "tokens": {
+      "input": 29312,
+      "output": 1472,
+      "cacheRead": 130144,
+      "cacheWrite": 9240
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "Based on 8,761 total farmers markets and a 2025 U.S. population of 341,784,857, the United States has **2.5633** farmers markets per 100,000 residents.",
+    "seconds": 15.9
+  },
+  {
+    "harness": "claude",
+    "run": 3,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.061402700000000004,
+    "tokens": {
+      "input": 29219,
+      "output": 1081,
+      "cacheRead": 101187,
+      "cacheWrite": 8330
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5361 farmers markets per 100,000 residents, calculated from 8,668 total farmers markets in the dataset and a 2025 U.S. population of 341,784,857.",
+    "seconds": 13.7
+  },
+  {
+    "harness": "claude",
+    "run": 4,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0701351,
+    "tokens": {
+      "input": 29211,
+      "output": 1346,
+      "cacheRead": 158481,
+      "cacheWrite": 9173
+    },
+    "turns": 8,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5361** farmers markets per 100,000 residents, based on 8,668 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 21.0
+  },
+  {
+    "harness": "claude",
+    "run": 5,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0669747,
+    "tokens": {
+      "input": 29203,
+      "output": 1303,
+      "cacheRead": 130027,
+      "cacheWrite": 9127
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 3.1730 farmers markets per 100,000 residents based on 10,521 total farmers markets and a 2020 census population of 331,578,104.",
+    "seconds": 15.0
+  },
+  {
+    "harness": "claude",
+    "run": 6,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0478145,
+    "tokens": {
+      "input": 701,
+      "output": 1484,
+      "cacheRead": 167695,
+      "cacheWrite": 11462
+    },
+    "turns": 8,
+    "verdict": "bait: territories-in-numerator (2.3243)",
+    "answer": "The U.S. has **2.3243** farmers markets per 100,000 residents, calculated from 7,944 total farmers markets divided by a 2025 population of 341,784,857.",
+    "seconds": 22.5
+  },
+  {
+    "harness": "claude",
+    "run": 7,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0659483,
+    "tokens": {
+      "input": 29202,
+      "output": 1161,
+      "cacheRead": 129893,
+      "cacheWrite": 8976
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5361** farmers markets per 100,000 residents, based on 8,668 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.3
+  },
+  {
+    "harness": "claude",
+    "run": 8,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06689609999999999,
+    "tokens": {
+      "input": 29226,
+      "output": 1295,
+      "cacheRead": 129791,
+      "cacheWrite": 9108
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5358** farmers markets per 100,000 residents, based on 8,667 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.6
+  },
+  {
+    "harness": "claude",
+    "run": 9,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0661699,
+    "tokens": {
+      "input": 29226,
+      "output": 1231,
+      "cacheRead": 129749,
+      "cacheWrite": 8907
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.7005 farmers markets per 100,000 residents, based on 9,230 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 19.0
+  },
+  {
+    "harness": "claude",
+    "run": 10,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06688020000000001,
+    "tokens": {
+      "input": 29211,
+      "output": 1330,
+      "cacheRead": 129872,
+      "cacheWrite": 9016
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5361 farmers markets per 100,000 residents based on 8,668 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 15.6
+  },
+  {
+    "harness": "claude",
+    "run": 11,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0669386,
+    "tokens": {
+      "input": 29226,
+      "output": 1346,
+      "cacheRead": 129766,
+      "cacheWrite": 9003
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5498 farmers markets per 100,000 residents, based on 8,715 total farmers markets across the country and a 2025 population of 341,784,857.",
+    "seconds": 14.9
+  },
+  {
+    "harness": "claude",
+    "run": 12,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0653157,
+    "tokens": {
+      "input": 29233,
+      "output": 1116,
+      "cacheRead": 129447,
+      "cacheWrite": 8779
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents based on the 8,668 total farmers markets and 2025 census population of 341,784,857.",
+    "seconds": 15.2
+  },
+  {
+    "harness": "claude",
+    "run": 13,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0655183,
+    "tokens": {
+      "input": 29220,
+      "output": 1143,
+      "cacheRead": 129433,
+      "cacheWrite": 8820
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.7172** farmers markets per 100,000 residents, based on 9,287 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 13.5
+  },
+  {
+    "harness": "claude",
+    "run": 14,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06717450000000001,
+    "tokens": {
+      "input": 29226,
+      "output": 1373,
+      "cacheRead": 129755,
+      "cacheWrite": 9054
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.8225 farmers markets per 100,000 residents based on 9,647 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 13.6
+  },
+  {
+    "harness": "claude",
+    "run": 15,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0653107,
+    "tokens": {
+      "input": 29199,
+      "output": 1119,
+      "cacheRead": 129407,
+      "cacheWrite": 8788
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5721** farmers markets per 100,000 residents, based on 8,791 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.1
+  },
+  {
+    "harness": "claude",
+    "run": 16,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0665308,
+    "tokens": {
+      "input": 29214,
+      "output": 1280,
+      "cacheRead": 129748,
+      "cacheWrite": 8971
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.6239 farmers markets per 100,000 residents (8,968 total farmers markets \u00f7 341,784,857 total population \u00d7 100,000).",
+    "seconds": 12.7
+  },
+  {
+    "harness": "claude",
+    "run": 17,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0655119,
+    "tokens": {
+      "input": 29203,
+      "output": 1145,
+      "cacheRead": 129599,
+      "cacheWrite": 8812
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5302 farmers markets per 100,000 residents based on 8,648 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 13.7
+  },
+  {
+    "harness": "claude",
+    "run": 18,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0662116,
+    "tokens": {
+      "input": 29210,
+      "output": 1252,
+      "cacheRead": 129516,
+      "cacheWrite": 8895
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "Based on 8,589 farmers markets from the dataset and the 2025 US population estimate of 341,784,857 residents, the United States has **2.5130 farmers markets per 100,000 residents**.",
+    "seconds": 16.7
+  },
+  {
+    "harness": "claude",
+    "run": 19,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06897650000000001,
+    "tokens": {
+      "input": 29326,
+      "output": 1608,
+      "cacheRead": 129925,
+      "cacheWrite": 9309
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5013 farmers markets per 100,000 residents based on 8,549 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 15.7
+  },
+  {
+    "harness": "claude",
+    "run": 20,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0667527,
+    "tokens": {
+      "input": 29210,
+      "output": 1325,
+      "cacheRead": 129757,
+      "cacheWrite": 8971
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4191 farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 14.1
+  },
+  {
+    "harness": "claude",
+    "run": 21,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06651049999999999,
+    "tokens": {
+      "input": 29229,
+      "output": 1269,
+      "cacheRead": 129805,
+      "cacheWrite": 8978
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 3.0168 farmers markets per 100,000 residents.",
+    "seconds": 13.8
+  },
+  {
+    "harness": "claude",
+    "run": 22,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0669064,
+    "tokens": {
+      "input": 29221,
+      "output": 1337,
+      "cacheRead": 130004,
+      "cacheWrite": 9000
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4191 farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 16.2
+  },
+  {
+    "harness": "claude",
+    "run": 23,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0496369,
+    "tokens": {
+      "input": 685,
+      "output": 993,
+      "cacheRead": 109089,
+      "cacheWrite": 16539
+    },
+    "turns": 4,
+    "verdict": "bait: territories-in-numerator (2.3243)",
+    "answer": "The United States has 2.3243 farmers markets per 100,000 residents based on 7,944 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 11.4
+  },
+  {
+    "harness": "claude",
+    "run": 24,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0675686,
+    "tokens": {
+      "input": 29229,
+      "output": 1440,
+      "cacheRead": 129836,
+      "cacheWrite": 9078
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5563 farmers markets per 100,000 residents based on 8,737 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 18.0
+  },
+  {
+    "harness": "claude",
+    "run": 25,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06667980000000001,
+    "tokens": {
+      "input": 29215,
+      "output": 1316,
+      "cacheRead": 129708,
+      "cacheWrite": 8957
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4837** farmers markets per 100,000 residents, based on 8,489 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 15.5
+  },
+  {
+    "harness": "claude",
+    "run": 26,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06747449999999999,
+    "tokens": {
+      "input": 29249,
+      "output": 1413,
+      "cacheRead": 129925,
+      "cacheWrite": 9084
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5417 farmers markets per 100,000 residents, based on 8,687 total farmers markets across a 2025 population of 341,784,857.",
+    "seconds": 16.0
+  },
+  {
+    "harness": "claude",
+    "run": 27,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06138640000000001,
+    "tokens": {
+      "input": 29217,
+      "output": 1097,
+      "cacheRead": 101124,
+      "cacheWrite": 8286
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.9524 farmers markets per 100,000 residents, based on 10,091 total farmers markets and a 2025 census estimate of 341,784,857 people.",
+    "seconds": 15.4
+  },
+  {
+    "harness": "claude",
+    "run": 28,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0658538,
+    "tokens": {
+      "input": 29222,
+      "output": 1200,
+      "cacheRead": 129478,
+      "cacheWrite": 8842
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **3.0783** farmers markets per 100,000 residents, based on 10,521 total markets from the dataset and a 2025 population of 341,784,857.",
+    "seconds": 14.5
+  },
+  {
+    "harness": "claude",
+    "run": 29,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0608884,
+    "tokens": {
+      "input": 29207,
+      "output": 1032,
+      "cacheRead": 101034,
+      "cacheWrite": 8209
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.6973 farmers markets per 100,000 residents, based on 9,219 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 13.7
+  },
+  {
+    "harness": "claude",
+    "run": 30,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0659142,
+    "tokens": {
+      "input": 29220,
+      "output": 1195,
+      "cacheRead": 129552,
+      "cacheWrite": 8882
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.8465 farmers markets per 100,000 residents based on 9,729 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 15.6
+  },
+  {
+    "harness": "claude",
+    "run": 31,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06667540000000001,
+    "tokens": {
+      "input": 29226,
+      "output": 1295,
+      "cacheRead": 129924,
+      "cacheWrite": 8991
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4191 farmers markets per 100,000 residents.",
+    "seconds": 14.4
+  },
+  {
+    "harness": "claude",
+    "run": 32,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0662639,
+    "tokens": {
+      "input": 29206,
+      "output": 1247,
+      "cacheRead": 129669,
+      "cacheWrite": 8928
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5774** farmers markets per 100,000 residents, based on 8,546 total farmers markets and a 2025 census population of 331,578,104.",
+    "seconds": 19.0
+  },
+  {
+    "harness": "claude",
+    "run": 33,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0616633,
+    "tokens": {
+      "input": 29216,
+      "output": 1146,
+      "cacheRead": 101153,
+      "cacheWrite": 8301
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.9059 farmers markets per 100,000 residents, based on a total of 9,932 farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 11.8
+  },
+  {
+    "harness": "claude",
+    "run": 34,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06611,
+    "tokens": {
+      "input": 29271,
+      "output": 1219,
+      "cacheRead": 129540,
+      "cacheWrite": 8895
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5440 farmers markets per 100,000 residents based on 8,695 total farmers markets and a 2025 census population estimate of 341,784,857.",
+    "seconds": 14.1
+  },
+  {
+    "harness": "claude",
+    "run": 35,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06560200000000001,
+    "tokens": {
+      "input": 29215,
+      "output": 1158,
+      "cacheRead": 129470,
+      "cacheWrite": 8825
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.7172 farmers markets per 100,000 residents, based on 9,287 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 13.0
+  },
+  {
+    "harness": "claude",
+    "run": 36,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0670447,
+    "tokens": {
+      "input": 29266,
+      "output": 1345,
+      "cacheRead": 129757,
+      "cacheWrite": 9039
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5414 farmers markets per 100,000 residents, based on 8,686 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.0
+  },
+  {
+    "harness": "claude",
+    "run": 37,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0658078,
+    "tokens": {
+      "input": 29232,
+      "output": 1189,
+      "cacheRead": 129448,
+      "cacheWrite": 8843
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4621 farmers markets per 100,000 residents based on 8,415 total markets and a 2025 census population of 341,784,857.",
+    "seconds": 14.4
+  },
+  {
+    "harness": "claude",
+    "run": 38,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.050147899999999995,
+    "tokens": {
+      "input": 685,
+      "output": 921,
+      "cacheRead": 117899,
+      "cacheWrite": 16534
+    },
+    "turns": 6,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.3242 farmers markets per 100,000 residents, based on 7,944 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 11.2
+  },
+  {
+    "harness": "claude",
+    "run": 39,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06687729999999999,
+    "tokens": {
+      "input": 29223,
+      "output": 1338,
+      "cacheRead": 129783,
+      "cacheWrite": 8993
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4191 farmers markets per 100,000 residents based on 8,268 total markets and 2025 census data showing 341,784,857 residents.",
+    "seconds": 18.5
+  },
+  {
+    "harness": "claude",
+    "run": 40,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0666683,
+    "tokens": {
+      "input": 29225,
+      "output": 1303,
+      "cacheRead": 129783,
+      "cacheWrite": 8975
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.6142** farmers markets per 100,000 residents, based on 8,668 total farmers markets from the 2026 dataset and the 2020 U.S. census population of 331,578,104.",
+    "seconds": 15.1
+  },
+  {
+    "harness": "claude",
+    "run": 41,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0668899,
+    "tokens": {
+      "input": 29224,
+      "output": 1334,
+      "cacheRead": 129679,
+      "cacheWrite": 9014
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4935 farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2020 census population of 331,578,104.",
+    "seconds": 15.1
+  },
+  {
+    "harness": "claude",
+    "run": 42,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.066346,
+    "tokens": {
+      "input": 29231,
+      "output": 1257,
+      "cacheRead": 129720,
+      "cacheWrite": 8929
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.9361** farmers markets per 100,000 residents, based on 10,035 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 15.0
+  },
+  {
+    "harness": "claude",
+    "run": 43,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0657013,
+    "tokens": {
+      "input": 29205,
+      "output": 1172,
+      "cacheRead": 129483,
+      "cacheWrite": 8844
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5185 farmers markets per 100,000 residents based on 8,608 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 14.6
+  },
+  {
+    "harness": "claude",
+    "run": 44,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0660283,
+    "tokens": {
+      "input": 29222,
+      "output": 1219,
+      "cacheRead": 129673,
+      "cacheWrite": 8872
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.4191** farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.1
+  },
+  {
+    "harness": "claude",
+    "run": 45,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0674952,
+    "tokens": {
+      "input": 29211,
+      "output": 1417,
+      "cacheRead": 129872,
+      "cacheWrite": 9106
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **3.0162** farmers markets per 100,000 residents, based on 10,309 total farmers markets across all states and territories and a 2025 census population estimate of 341,784,857.",
+    "seconds": 14.9
+  },
+  {
+    "harness": "claude",
+    "run": 46,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0662676,
+    "tokens": {
+      "input": 29229,
+      "output": 1257,
+      "cacheRead": 129636,
+      "cacheWrite": 8895
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4191 farmers markets per 100,000 residents, based on 8,268 total farmers markets from the 2026 dataset and a 2025 census population of 341,784,857.",
+    "seconds": 14.4
+  },
+  {
+    "harness": "claude",
+    "run": 47,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0660911,
+    "tokens": {
+      "input": 29217,
+      "output": 1210,
+      "cacheRead": 129721,
+      "cacheWrite": 8926
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.7116 farmers markets per 100,000 residents.",
+    "seconds": 13.6
+  },
+  {
+    "harness": "claude",
+    "run": 48,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0676146,
+    "tokens": {
+      "input": 29226,
+      "output": 1443,
+      "cacheRead": 129896,
+      "cacheWrite": 9092
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5636 farmers markets per 100,000 residents based on 8,762 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 15.3
+  },
+  {
+    "harness": "claude",
+    "run": 49,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.047404800000000004,
+    "tokens": {
+      "input": 677,
+      "output": 1061,
+      "cacheRead": 81828,
+      "cacheWrite": 16620
+    },
+    "turns": 4,
+    "verdict": "bait: territories-in-numerator (2.3243)",
+    "answer": "The United States has 2.3243 farmers markets per 100,000 residents, based on 7,944 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 11.1
+  },
+  {
+    "harness": "claude",
+    "run": 50,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0699964,
+    "tokens": {
+      "input": 29217,
+      "output": 1373,
+      "cacheRead": 158224,
+      "cacheWrite": 9046
+    },
+    "turns": 8,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents based on 8,668 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 21.0
+  },
+  {
+    "harness": "claude",
+    "run": 51,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06664120000000001,
+    "tokens": {
+      "input": 29270,
+      "output": 1292,
+      "cacheRead": 129612,
+      "cacheWrite": 8975
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4935 farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2025 census population of 331,578,104.",
+    "seconds": 17.1
+  },
+  {
+    "harness": "claude",
+    "run": 52,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0657602,
+    "tokens": {
+      "input": 29218,
+      "output": 1173,
+      "cacheRead": 129472,
+      "cacheWrite": 8865
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5358 farmers markets per 100,000 residents based on 8,667 total markets and 341,784,857 residents.",
+    "seconds": 15.2
+  },
+  {
+    "harness": "claude",
+    "run": 53,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06700909999999999,
+    "tokens": {
+      "input": 29225,
+      "output": 1348,
+      "cacheRead": 129681,
+      "cacheWrite": 9038
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.6090 farmers markets per 100,000 residents, based on 8,651 total farmers markets and a U.S. population of 331,578,104.",
+    "seconds": 15.3
+  },
+  {
+    "harness": "claude",
+    "run": 54,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06615220000000001,
+    "tokens": {
+      "input": 29222,
+      "output": 1227,
+      "cacheRead": 129532,
+      "cacheWrite": 8921
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.4317** farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2024 U.S. population of 340,003,797.",
+    "seconds": 14.8
+  },
+  {
+    "harness": "claude",
+    "run": 55,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0608168,
+    "tokens": {
+      "input": 29218,
+      "output": 1023,
+      "cacheRead": 101038,
+      "cacheWrite": 8190
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.6142 farmers markets per 100,000 residents, based on 8,668 total farmers markets and a census population of 331,578,104.",
+    "seconds": 12.4
+  },
+  {
+    "harness": "claude",
+    "run": 56,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0663333,
+    "tokens": {
+      "input": 29228,
+      "output": 1256,
+      "cacheRead": 129693,
+      "cacheWrite": 8928
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.6985** farmers markets per 100,000 residents, based on 9,223 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 15.2
+  },
+  {
+    "harness": "claude",
+    "run": 57,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0695017,
+    "tokens": {
+      "input": 29212,
+      "output": 1303,
+      "cacheRead": 157987,
+      "cacheWrite": 8988
+    },
+    "turns": 8,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.7365** farmers markets per 100,000 residents based on 9,353 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 16.4
+  },
+  {
+    "harness": "claude",
+    "run": 58,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0668205,
+    "tokens": {
+      "input": 29229,
+      "output": 1337,
+      "cacheRead": 129605,
+      "cacheWrite": 8973
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4191 farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 17.3
+  },
+  {
+    "harness": "claude",
+    "run": 59,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0659779,
+    "tokens": {
+      "input": 29217,
+      "output": 1204,
+      "cacheRead": 129609,
+      "cacheWrite": 8890
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.8421** farmers markets per 100,000 residents based on 9,714 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 15.7
+  },
+  {
+    "harness": "claude",
+    "run": 60,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.061765099999999996,
+    "tokens": {
+      "input": 29216,
+      "output": 1151,
+      "cacheRead": 101201,
+      "cacheWrite": 8337
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 3.0994 farmers markets per 100,000 residents.",
+    "seconds": 13.2
+  },
+  {
+    "harness": "claude",
+    "run": 61,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0657635,
+    "tokens": {
+      "input": 29227,
+      "output": 1165,
+      "cacheRead": 129515,
+      "cacheWrite": 8880
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4191 farmers markets per 100,000 residents.",
+    "seconds": 14.8
+  },
+  {
+    "harness": "claude",
+    "run": 62,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0666275,
+    "tokens": {
+      "input": 29206,
+      "output": 1302,
+      "cacheRead": 129875,
+      "cacheWrite": 8962
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **3.3521 farmers markets per 100,000 residents** based on 11,457 total farmers markets and the 2025 population estimate of 341,784,857.",
+    "seconds": 14.9
+  },
+  {
+    "harness": "claude",
+    "run": 63,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0673938,
+    "tokens": {
+      "input": 29228,
+      "output": 1409,
+      "cacheRead": 129888,
+      "cacheWrite": 9066
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4966** farmers markets per 100,000 residents based on 8,533 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.8
+  },
+  {
+    "harness": "claude",
+    "run": 64,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0670678,
+    "tokens": {
+      "input": 29223,
+      "output": 1368,
+      "cacheRead": 129708,
+      "cacheWrite": 9017
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.4191** farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2025 U.S. population of 341,784,857.",
+    "seconds": 15.4
+  },
+  {
+    "harness": "claude",
+    "run": 65,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0659453,
+    "tokens": {
+      "input": 29223,
+      "output": 1204,
+      "cacheRead": 129603,
+      "cacheWrite": 8871
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5361** farmers markets per 100,000 residents, based on 8,668 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 13.5
+  },
+  {
+    "harness": "claude",
+    "run": 66,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.07046220000000002,
+    "tokens": {
+      "input": 29236,
+      "output": 1441,
+      "cacheRead": 158352,
+      "cacheWrite": 9093
+    },
+    "turns": 8,
+    "verdict": "wrong: other",
+    "answer": "Based on the 2026 farmers markets dataset (9,154 markets) and the 2024 census population estimate (340,003,797), the United States has **2.6923** farmers markets per 100,000 residents.",
+    "seconds": 21.3
+  },
+  {
+    "harness": "claude",
+    "run": 67,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0666448,
+    "tokens": {
+      "input": 29208,
+      "output": 1307,
+      "cacheRead": 129818,
+      "cacheWrite": 8960
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **3.0159** farmers markets per 100,000 residents, based on 10,308 total farmers markets from the Harvestly dataset and 341,784,857 residents from the 2025 census estimates.",
+    "seconds": 16.8
+  },
+  {
+    "harness": "claude",
+    "run": 68,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0650502,
+    "tokens": {
+      "input": 29209,
+      "output": 1070,
+      "cacheRead": 129432,
+      "cacheWrite": 8774
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.7090 farmers markets per 100,000 residents.",
+    "seconds": 12.8
+  },
+  {
+    "harness": "claude",
+    "run": 69,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0681835,
+    "tokens": {
+      "input": 29223,
+      "output": 1520,
+      "cacheRead": 130105,
+      "cacheWrite": 9175
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.6407** farmers markets per 100,000 residents, based on 8,756 total farmers markets and a 2020 census population of 331,578,104.",
+    "seconds": 17.0
+  },
+  {
+    "harness": "claude",
+    "run": 70,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06744460000000001,
+    "tokens": {
+      "input": 29232,
+      "output": 1419,
+      "cacheRead": 129776,
+      "cacheWrite": 9070
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.6139 farmers markets per 100,000 residents based on 8,667 total farmers markets and a 2020 census population of 331,578,104.",
+    "seconds": 15.6
+  },
+  {
+    "harness": "claude",
+    "run": 71,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06177360000000001,
+    "tokens": {
+      "input": 29208,
+      "output": 1158,
+      "cacheRead": 101216,
+      "cacheWrite": 8327
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5361 farmers markets per 100,000 residents based on 8,668 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 12.9
+  },
+  {
+    "harness": "claude",
+    "run": 72,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0661842,
+    "tokens": {
+      "input": 29225,
+      "output": 1233,
+      "cacheRead": 129682,
+      "cacheWrite": 8913
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.0033** farmers markets per 100,000 residents based on the dataset's total of 6,847 farmers markets and the 2025 census population of 341,784,857.",
+    "seconds": 14.9
+  },
+  {
+    "harness": "claude",
+    "run": 73,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06671149999999999,
+    "tokens": {
+      "input": 29225,
+      "output": 1312,
+      "cacheRead": 129765,
+      "cacheWrite": 8975
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4191** farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2025 U.S. population estimate of 341,784,857.",
+    "seconds": 15.2
+  },
+  {
+    "harness": "claude",
+    "run": 74,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06570140000000001,
+    "tokens": {
+      "input": 29216,
+      "output": 1158,
+      "cacheRead": 129634,
+      "cacheWrite": 8866
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.6528 farmers markets per 100,000 residents.",
+    "seconds": 13.5
+  },
+  {
+    "harness": "claude",
+    "run": 75,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.065467,
+    "tokens": {
+      "input": 29223,
+      "output": 1145,
+      "cacheRead": 129430,
+      "cacheWrite": 8788
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.9448** farmers markets per 100,000 residents according to the 2026 market dataset (10,065 total markets) and the 2025 census population estimate (341,784,857).",
+    "seconds": 13.2
+  },
+  {
+    "harness": "claude",
+    "run": 76,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0654274,
+    "tokens": {
+      "input": 29225,
+      "output": 1120,
+      "cacheRead": 129504,
+      "cacheWrite": 8826
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents.",
+    "seconds": 13.7
+  },
+  {
+    "harness": "claude",
+    "run": 77,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0662619,
+    "tokens": {
+      "input": 29212,
+      "output": 1250,
+      "cacheRead": 129739,
+      "cacheWrite": 8913
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents based on 8,668 total markets and an estimated 2025 population of 341,784,857.",
+    "seconds": 14.5
+  },
+  {
+    "harness": "claude",
+    "run": 78,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0618571,
+    "tokens": {
+      "input": 29215,
+      "output": 1165,
+      "cacheRead": 101131,
+      "cacheWrite": 8352
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4191** farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2025 U.S. population of 341,784,857.",
+    "seconds": 12.8
+  },
+  {
+    "harness": "claude",
+    "run": 79,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0661646,
+    "tokens": {
+      "input": 29240,
+      "output": 1228,
+      "cacheRead": 129746,
+      "cacheWrite": 8905
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.4191 farmers markets per 100,000 residents based on 8,268 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.1
+  },
+  {
+    "harness": "claude",
+    "run": 80,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0668906,
+    "tokens": {
+      "input": 29224,
+      "output": 1332,
+      "cacheRead": 129986,
+      "cacheWrite": 9004
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4191** farmers markets per 100,000 residents, based on 8,268 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 15.6
+  },
+  {
+    "harness": "claude",
+    "run": 81,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0665637,
+    "tokens": {
+      "input": 29229,
+      "output": 1286,
+      "cacheRead": 129707,
+      "cacheWrite": 8967
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5417** farmers markets per 100,000 residents, based on 8,687 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 18.8
+  },
+  {
+    "harness": "claude",
+    "run": 82,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06183980000000001,
+    "tokens": {
+      "input": 29214,
+      "output": 1159,
+      "cacheRead": 101308,
+      "cacheWrite": 8350
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents based on 8,668 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 15.5
+  },
+  {
+    "harness": "claude",
+    "run": 83,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0661422,
+    "tokens": {
+      "input": 29203,
+      "output": 1236,
+      "cacheRead": 129552,
+      "cacheWrite": 8902
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "Based on 9,050 farmers markets and the 2025 U.S. population estimate of 341,784,857, the United States has 2.6479 farmers markets per 100,000 residents.",
+    "seconds": 21.2
+  },
+  {
+    "harness": "claude",
+    "run": 84,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0649349,
+    "tokens": {
+      "input": 29230,
+      "output": 1057,
+      "cacheRead": 129379,
+      "cacheWrite": 8741
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.4720 farmers markets per 100,000 residents based on 8,449 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 13.6
+  },
+  {
+    "harness": "claude",
+    "run": 85,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0665786,
+    "tokens": {
+      "input": 29222,
+      "output": 1296,
+      "cacheRead": 129926,
+      "cacheWrite": 8942
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.4935** farmers markets per 100,000 residents, based on 8,268 total farmers markets from the dataset and a 2020 census population of 331,578,104.",
+    "seconds": 16.9
+  },
+  {
+    "harness": "claude",
+    "run": 86,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06600130000000001,
+    "tokens": {
+      "input": 29206,
+      "output": 1204,
+      "cacheRead": 129573,
+      "cacheWrite": 8909
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.8416 farmers markets per 100,000 residents.",
+    "seconds": 14.3
+  },
+  {
+    "harness": "claude",
+    "run": 87,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.066275,
+    "tokens": {
+      "input": 29224,
+      "output": 1254,
+      "cacheRead": 129730,
+      "cacheWrite": 8904
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.9396 farmers markets per 100,000 residents, based on 10,047 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.2
+  },
+  {
+    "harness": "claude",
+    "run": 88,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06722415000000001,
+    "tokens": {
+      "input": 29233,
+      "output": 1394,
+      "cacheRead": 129894,
+      "cacheWrite": 9092
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 3.1413 farmers markets per 100,000 residents.",
+    "seconds": 16.1
+  },
+  {
+    "harness": "claude",
+    "run": 89,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06688960000000001,
+    "tokens": {
+      "input": 29219,
+      "output": 1333,
+      "cacheRead": 129716,
+      "cacheWrite": 9017
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.9448** farmers markets per 100,000 residents, based on 10,065 total farmers markets and a 2025 census population estimate of 341,784,857.",
+    "seconds": 13.9
+  },
+  {
+    "harness": "claude",
+    "run": 90,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0612946,
+    "tokens": {
+      "input": 29199,
+      "output": 1092,
+      "cacheRead": 101156,
+      "cacheWrite": 8260
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5361 farmers markets per 100,000 residents based on 8,668 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 11.9
+  },
+  {
+    "harness": "claude",
+    "run": 91,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0672445,
+    "tokens": {
+      "input": 29226,
+      "output": 1401,
+      "cacheRead": 129830,
+      "cacheWrite": 9097
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.5618** farmers markets per 100,000 residents, based on 8,756 total farmers markets and a 2025 US population of 341,784,857.",
+    "seconds": 14.0
+  },
+  {
+    "harness": "claude",
+    "run": 92,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.07022025,
+    "tokens": {
+      "input": 29244,
+      "output": 1441,
+      "cacheRead": 158465,
+      "cacheWrite": 9103
+    },
+    "turns": 8,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has **2.5417** farmers markets per 100,000 residents based on the 8,687 farmers markets in the dataset and the 2025 census estimate of 341,784,857 people.",
+    "seconds": 17.6
+  },
+  {
+    "harness": "claude",
+    "run": 93,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0649269,
+    "tokens": {
+      "input": 29222,
+      "output": 1134,
+      "cacheRead": 129429,
+      "cacheWrite": 8825
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.7169 farmers markets per 100,000 residents based on 9,286 total farmers markets and a 2025 population estimate of 341,784,857.",
+    "seconds": 15.0
+  },
+  {
+    "harness": "claude",
+    "run": 94,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0673009,
+    "tokens": {
+      "input": 29219,
+      "output": 1324,
+      "cacheRead": 129084,
+      "cacheWrite": 9612
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "Based on 9,573 total farmers markets from the 2026 dataset and 341,784,857 residents from the 2025 census estimate, the U.S. has **2.8009** farmers markets per 100,000 residents.",
+    "seconds": 14.8
+  },
+  {
+    "harness": "claude",
+    "run": 95,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06551944999999999,
+    "tokens": {
+      "input": 29228,
+      "output": 1296,
+      "cacheRead": 129732,
+      "cacheWrite": 8943
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5361 farmers markets per 100,000 residents, based on 8,668 total farmers markets and a 2025 census population of 341,784,857.",
+    "seconds": 15.3
+  },
+  {
+    "harness": "claude",
+    "run": 96,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.061487,
+    "tokens": {
+      "input": 29302,
+      "output": 1310,
+      "cacheRead": 101165,
+      "cacheWrite": 8444
+    },
+    "turns": 5,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.6139 farmers markets per 100,000 residents, based on 8,667 total farmers markets and a 2025-census-derived population of 331,578,104.",
+    "seconds": 17.6
+  },
+  {
+    "harness": "claude",
+    "run": 97,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0647476,
+    "tokens": {
+      "input": 29205,
+      "output": 1282,
+      "cacheRead": 129581,
+      "cacheWrite": 8970
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.5361 farmers markets per 100,000 residents.",
+    "seconds": 14.4
+  },
+  {
+    "harness": "claude",
+    "run": 98,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.06375494999999999,
+    "tokens": {
+      "input": 29195,
+      "output": 1127,
+      "cacheRead": 129472,
+      "cacheWrite": 8812
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The U.S. has 2.1970 farmers markets per 100,000 residents based on 7,509 total farmers markets and a 2025 population of 341,784,857.",
+    "seconds": 14.7
+  },
+  {
+    "harness": "claude",
+    "run": 99,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0646593,
+    "tokens": {
+      "input": 29272,
+      "output": 1253,
+      "cacheRead": 129653,
+      "cacheWrite": 8956
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has 2.5019 farmers markets per 100,000 residents.",
+    "seconds": 12.4
+  },
+  {
+    "harness": "claude",
+    "run": 100,
+    "model": "claude-haiku-4-5",
+    "cost_usd": 0.0647434,
+    "tokens": {
+      "input": 29227,
+      "output": 1287,
+      "cacheRead": 129634,
+      "cacheWrite": 8926
+    },
+    "turns": 7,
+    "verdict": "wrong: other",
+    "answer": "The United States has **2.5361** farmers markets per 100,000 residents, based on 8,668 total farmers markets from the 2026 dataset and a 2025 U.S. population estimate of 341,784,857.",
+    "seconds": 20.8
+  }
+]

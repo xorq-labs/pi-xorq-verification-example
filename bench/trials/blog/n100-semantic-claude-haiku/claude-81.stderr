@@ -1,0 +1,5 @@
+warning: error: unable to download 'https://api.github.com/repos/sadjow/claude-code-nix/commits/HEAD': HTTP error 403
+
+       response body:
+
+       {"message":"API rate limit exceeded for 100.36.136.250. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"}; using cached version
