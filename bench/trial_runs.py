@@ -77,7 +77,23 @@ SCORING = {
             "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
         },
     },
+    # Ablation: the SAME hint-free prompt, but the pi runs get NO seeded
+    # semantic model — the harness's determinism with nowhere reviewed to bind.
+    # Expected shape: 0/20 right, but reliably on the whole-file bait rather
+    # than scattered fabrications.
+    "denominator-us-semantic-nomodel": {
+        "right": r"2\.3237",
+        "baits": {
+            "territories-in-numerator (2.3243)": r"2\.3243",
+            "double-count-all-rows (0.5796/0.5797)": r"0\.579[67]",
+            "sumlev40-adds-PR (2.3022/2.3028)": r"2\.302[28]",
+        },
+    },
 }
+
+# Trap ids that reuse another trap's prompt text (the variation is in the
+# harness setup, not the wording).
+PROMPT_ALIAS = {"denominator-us-semantic-nomodel": "denominator-us-semantic"}
 
 # Traps whose pi runs need the catalog pre-seeded with the reviewed BSL
 # semantic model before the agent starts (bare claude runs get nothing —
@@ -109,6 +125,7 @@ PI_PROJECT_DIRS = ("extensions", "skills", ".pi", "src")
 
 
 def duel_prompt(trap_id: str) -> str:
+    trap_id = PROMPT_ALIAS.get(trap_id, trap_id)
     out = subprocess.run(
         (sys.executable, str(REPO / "bench" / "hallucination_prompts.py"), "--duel", trap_id),
         capture_output=True, text=True, check=True,
@@ -173,12 +190,18 @@ def classify(answer: str, trap_id: str) -> str:
 
 
 def run_claude(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
-               model: str = MODEL_CLAUDE) -> dict:
+               model: str = MODEL_CLAUDE, stream: bool = False) -> dict:
     work = Path(tempfile.mkdtemp(prefix=f"trial-claude-{idx}-"))
     (work / ".claude").mkdir()
     (work / ".claude" / "empty-mcp.json").write_text('{"mcpServers":{}}')
+    # stream mode keeps the FULL transcript (every tool call + result) in the
+    # .stdout artifact — needed for failure taxonomy (did it fetch? did it
+    # count with a tool or in its head?). The final "result" event carries the
+    # same payload as plain --output-format json.
+    fmt = ("--output-format", "stream-json", "--verbose") if stream \
+        else ("--output-format", "json")
     cmd = (
-        "claude", "-p", prompt, "--model", model, "--output-format", "json",
+        "claude", "-p", prompt, "--model", model, *fmt,
         "--strict-mcp-config", "--mcp-config", str(work / ".claude" / "empty-mcp.json"),
         "--allowedTools", CLAUDE_ALLOWED_TOOLS,
     )
@@ -189,7 +212,14 @@ def run_claude(prompt: str, trap_id: str, out_dir: Path, idx: int, timeout: int,
         (out_dir / f"claude-{idx:02d}.stdout").write_text(proc.stdout)
         (out_dir / f"claude-{idx:02d}.stderr").write_text(proc.stderr)
         try:
-            payload = json.loads(proc.stdout)
+            if stream:
+                payload = next(
+                    ev for line in reversed(proc.stdout.splitlines())
+                    if line.strip().startswith("{")
+                    and (ev := json.loads(line)).get("type") == "result"
+                )
+            else:
+                payload = json.loads(proc.stdout)
             answer = payload.get("result", "")
             rec["cost_usd"] = payload.get("total_cost_usd")
             rec["tokens"] = claude_tokens(payload)
@@ -319,6 +349,8 @@ def main() -> int:
     ap.add_argument("--harness", default="both", choices=("both", "claude", "pi"))
     ap.add_argument("--claude-model", default=MODEL_CLAUDE,
                     help="model for the bare claude harness (e.g. claude-opus-5)")
+    ap.add_argument("--claude-stream", action="store_true",
+                    help="capture claude runs' full tool transcript (stream-json)")
     ap.add_argument("--pi-model", default=MODEL_PI,
                     help="model for the pi harness (pi provider/id form)")
     ap.add_argument("--pi-thinking", default=None,
@@ -347,7 +379,8 @@ def main() -> int:
         for h, i in tasks:
             if h == "claude":
                 fut = pool.submit(run_claude, prompt, args.trap, out_dir, i,
-                                  args.claude_timeout, args.claude_model)
+                                  args.claude_timeout, args.claude_model,
+                                  args.claude_stream)
             else:
                 fut = pool.submit(run_pi, prompt, args.trap, out_dir, i,
                                   args.pi_timeout, args.pi_model, args.pi_thinking)

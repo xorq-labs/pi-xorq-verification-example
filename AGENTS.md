@@ -36,8 +36,13 @@ State one only when the same turn discharged an `argmax`/`argmin` (or ordered
 ratio, per-capita, or other formula the catalog doesn't hold as a bare column,
 do not compute the number in your head and "verify the inputs":
 1. **Compose the metric into the catalog** as its own alias —
-   `xorq catalog compose <base-alias> -c "source.mutate(metric = <formula over
-   columns>)" -a <metric-alias>` — for a formula over ONE alias's columns.
+   `xorq catalog compose -p .xorq/catalog <base-alias> -c "source.mutate(metric
+   = <formula over columns>)" -a <metric-alias>` — for a formula over ONE
+   alias's columns. (Always pass `-p`: without it the CLI consults the default
+   catalog and errors "Entry not found" even though the alias exists.) Never
+   compose over a SEMANTIC-MODEL alias at all — if the metric involves a
+   model's measures, a reviewed measure for it almost certainly exists; query
+   it by name instead.
 2. A **cross-dataset metric is a build script that reads both sources** and
    joins them (compose snapshots its input and cannot stage a second dataset —
    it fails `no_local` lineage). Follow the xorq-catalog skill's "Join two
@@ -70,6 +75,10 @@ never pad a pre-rounded column with zeros.
    metric definitions, and when one matches the question you answer by
    querying it BY NAME (`xorq_semantic_schema` lists the names; the
    semantic-model skill has the full pattern) — never by re-deriving it.
+   Query the measure that answers the question DIRECTLY, never its component
+   measures: a measure queried with NO dimensions already returns the model's
+   grand total at its full reviewed scope, so a bare query of a rate/total
+   measure IS the national answer — nothing to aggregate, compose, or divide.
    Then `xorq_catalog_list_aliases` and `xorq_catalog_schema` on each alias
    you will use. Compose only on declared aliases.
 

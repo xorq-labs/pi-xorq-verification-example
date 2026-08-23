@@ -264,9 +264,10 @@ it.)
   witness evaluation (selection-only — it reads cells from the result, never
   computes them). This is the trust root. Every step fails closed to
   `COULD-NOT-DISCHARGE`, so a witness that will not build or evaluate can never
-  become a false pass. `scalar`/`count`/`argmax`/`argmin`/`membership` discharge
+  become a false pass. `scalar`/`count`/`argmax`/`argmin`/`membership`/`table` discharge
   fully today (see the 2026-07-03 op-tree update for how maximality is now
-  discharged rather than asserted); `compare`/`metric`/`metadata`/`provenance` are
+  discharged rather than asserted, and the 2026-08-16 update for semantic-model
+  scalars declared by measure name); `compare`/`metric`/`metadata`/`provenance` are
   declared but fail closed until their predicate models land.
 - **Analyst role prompt** (`src/pi_xorq_verifier/prompts/analyst.md`, the single
   prompt, shipped as package data): pi auto-loads it from a consumer's `AGENTS.md`
@@ -637,6 +638,110 @@ decision procedure is unchanged:
 - The checker's ungrounded-scalar `build_error` now self-explains ("needs
   `expression`") instead of returning nothing, closing the diagnostic gap the
   split exposed.
+
+### Update 2026-08-14 (friction cuts — the select-only scalar, one snapshot per request)
+
+Watching real runs stall exposed friction that changed behavior, not the
+decision procedure:
+
+- **An ungrounded scalar now synthesizes from `predicate.select` alone.** When
+  the claimed value is a bare cell of the alias, naming its column is enough —
+  the shape every producer tried first used to dead-end in a "needs
+  `expression`" retry loop. `expression` remains the escape hatch for a scalar
+  the checker cannot synthesize. Ambiguity still fails closed: a selection over
+  a multi-row population holding *distinct* cells does not discharge (the grain
+  check of the 2026-07-03 grounding update is unchanged).
+- **One execution snapshot per verify request.** N obligations on one alias
+  share a single fetch per source (`snapshot_alias`) instead of re-fetching per
+  obligation. Soundness-neutral by construction: structural validation and
+  `witness_code` stay on the raw expressions, the data still comes from the
+  true declared sources fetched at request time, the snapshot's directory dies
+  with the request, and it fails *open* to the uncached path — correctness
+  never depends on the cache. This is distinct from the cross-turn
+  `select-cache` under `xorq_select`, which wraps the alias so repeated peeks
+  share one fetch: that cache can *propose* a number but never *certify* one
+  (the verification path never reads it).
+- **Witness persistence is its own phase and runs concurrently** — the slow
+  round-trip confirmations overlap; catalog writes serialize behind a lock
+  (each commits into the catalog's git repo). Persisted composes build with
+  `--use-this-venv` (~7s → ~1s per witness): the checker just executed the
+  alias in-process, so this venv provably has what the entry needs.
+- **Common mis-declarations get named errors.** `requires_sources: true` was
+  guessed in nearly every run and died as `'bool' object is not iterable`; it
+  now raises an error naming the field and the fix. Bare strings coerce to
+  singleton lists there and for `predicate.columns`. The extension's
+  `obligations` parameter is now typed to match `request.schema.json` — the
+  untyped `Array(Any)` let the model invent shapes.
+
+### Update 2026-08-16 (semantic-model claims — reviewed scope lives in the catalog, not the prompt)
+
+A benchmark trap (a per-100k ratio whose prompt carries *no* scope hints)
+showed the modeling layer of §5 is where wrong-but-discharging answers come
+from: bare agents improvise mismatched scopes (territories in the numerator,
+a SUMLEV-40 denominator) and stamp them VERIFIED — faithfully, since the
+checker certifies the declared expression, not the reading. The fix moves the
+reviewed scope into the catalog as a **boring-semantic-layer (BSL) model** (a
+cataloged alias whose tag declares dimensions and *measures* — named,
+pre-reviewed computations), and teaches the checker to treat querying a
+reviewed measure as selection:
+
+- **`selection_only` exempts the alias's own tag-declared measures.** A BSL
+  measure's arithmetic lives in the cataloged model and only expands into the
+  op-tree when queried by name, so those nodes fold into the alias base
+  (`_bsl_measure_nodes`) — the same principle as the 2026-07-03 derived-metric
+  fix (the "no arithmetic" rule constrains what the *witness adds on top*,
+  never the reviewed pipeline). Arithmetic matching no declared measure still
+  fails.
+- **Declarative semantic obligations.** `predicate` gains `measures` /
+  `dimensions` (by-name, from the model), and for a semantic scalar the
+  checker **synthesizes the witness itself** —
+  `source.ls.builder.query(dimensions=…, measures=…)` — so the producer
+  declares the site and never writes the expression, extending §6's "a
+  producer never hand-writes the ranking" to measures. It ranges over the
+  whole model: `population` fails closed alongside `measures`; unknown names
+  fail closed with the model's measure list in the detail. `witness_code`
+  emits the by-name query, so persisted `verify-<id>` entries round-trip.
+- **Failures self-explain at the observed dead ends** (the
+  silent-degradation theme of 2026-07-03, closed for semantic aliases): a
+  witness that *built* but failed `selection_only` on a semantic alias gets
+  the `predicate.measures` recipe instead of a bare "ill-formed witness"
+  (`check_hint`); a failed compose on a semantic alias re-raises with the
+  by-name pattern (measures are not columns of `source`). The extension
+  annotates semantic-model aliases inline in list-aliases, names measures in
+  schema output, and warns on a hand-written compose against a model alias at
+  the moment it *succeeds* — not when it later fails `selection_only`.
+- **Agent-side affordances** (workflow, not trust root): three extension tools
+  (`xorq_semantic_models`, `xorq_semantic_schema`, `xorq_semantic_select` —
+  by-name reads with no compose string to assemble), a `semantic-model` skill,
+  and an Orient step in the analyst role that checks for semantic models first
+  — even when the prompt cites source URLs, closing the observed "ingest and
+  re-derive a reviewed measure by hand" path. Measured on the hint-free trap
+  with a seeded model: 3/3 right and stamped, versus improvised mismatched
+  scopes without it.
+
+The honest boundary is unchanged in kind but moved in practice: question →
+expression remains the uncertified modeling step (§5), but a reviewed model
+narrows it to question → *measure name*, and the review of the measure is a
+human act recorded in the catalog — auditable, versioned, and shared across
+every answer that cites it, instead of re-improvised per run.
+
+Two answer-gate fixes from the same bench (extension-side; the checker never
+sees prose):
+
+- **The answer contract is stated up front.** `xorq_verify`'s result now ends
+  with the discharged figures this certificate covers and the rule that any
+  other stated number must be verified or left out — the agent used to learn
+  which figures were blessed only *after* answering ("2.3237, from 7,942
+  markets and 341,784,857 residents" is three claims, not one).
+- **Refutations are scoped to the answer that states them.** A standing
+  numeric refutation used to refuse answers that never stated the refuted
+  value (a typo'd obligation surface, REFUTED, then the corrected value
+  discharged — banner still blocked). `statedRefuted` / `statedUncovered`
+  scope *numeric* surfaces to the answer's own text; *text* refutations
+  (wrong entity/category) stand regardless. And a bare count directly before
+  "states" ("the 50 states") is a scope idiom, not a data claim; a count
+  before any other noun still demands a witness. Fail-honest is preserved: a
+  right answer stating an undeclared supporting figure still loses the banner.
 
 ## References
 

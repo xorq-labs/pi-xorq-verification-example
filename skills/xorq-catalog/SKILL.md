@@ -30,7 +30,10 @@ NAME — the semantic-model skill has the pattern — and you do not ingest the
 raw sources at all, even though the prompt cites them: the measure's reviewed
 definition already encodes the scope the prompt leaves unstated, and
 re-deriving it from the raw files is how defensible-looking wrong answers
-happen. Only with no matching measure do you continue here:
+happen. Query the measure that answers DIRECTLY, never its components: a
+measure queried with no dimensions is already the grand total at the model's
+full reviewed scope — nothing to aggregate, compose, or divide afterward.
+Only with no matching measure do you continue here:
 
 ```bash
 xorq catalog -p .xorq/catalog list-aliases   # what's available

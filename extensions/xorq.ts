@@ -514,7 +514,9 @@ export default function (pi: ExtensionAPI) {
           .join("\n") +
         "\n\nRead a measure with xorq_semantic_select (measures=['<measure>']).\n" +
         "Pick the measure that answers the question DIRECTLY — never fetch component\n" +
-        "measures and combine them by hand: hand arithmetic fails verification.";
+        "measures and combine them by hand: hand arithmetic fails verification.\n" +
+        "A measure queried with NO dimensions is already the model's GRAND TOTAL\n" +
+        "(full reviewed scope) — do not aggregate, compose, or re-derive it.";
       return { content: [{ type: "text", text }], details: models };
     },
   });
@@ -556,6 +558,9 @@ export default function (pi: ExtensionAPI) {
         "dimensions=['<dim>'] to slice). Measures are NOT columns of the alias.",
         "Pick the measure that answers the question directly — combining component",
         "measures by hand fails verification.",
+        "With NO dimensions, a measure returns the model's GRAND TOTAL (its full",
+        "reviewed scope) — a rate/total measure queried bare IS the national answer;",
+        "never aggregate it further or rebuild it from components.",
         "Verify with predicate = {\"measures\": [\"<measure>\"], \"select\": \"<measure>\"}",
         "— no `expression`: the checker synthesizes the reviewed query itself.",
       ].join("\n");
@@ -613,11 +618,27 @@ export default function (pi: ExtensionAPI) {
       );
       const r = await pi.exec(cmd, argv, { timeout: LONG, signal });
       if (r.code !== 0) throw new Error(`xorq_semantic_select: ${r.stderr}`);
-      const note =
+      let note =
         `\n(reviewed query: ${compose})\n` +
         `verify with: predicate = {"measures": ${JSON.stringify(params.measures)}` +
         (dims.length ? `, "dimensions": ${JSON.stringify(dims)}` : "") +
         `, "select": "${params.measures[0]}"}`;
+      // Component-grab guard: an agent that selects a SUBSET of the model's
+      // measures and then combines them by hand is the observed failure mode
+      // (it re-derives a ratio a reviewed measure already defines, and the
+      // hand-derived figure fails verification). Surface the unselected
+      // measures right next to the values so the direct one is in view.
+      try {
+        const tm = await cachedBslTag(params.catalog_path, params.alias, signal);
+        const all = pairNames(tm?.measures);
+        const other = all.filter((m: string) => !params.measures.includes(m));
+        if (other.length)
+          note +=
+            `\nother reviewed measures on this model: ${other.join(", ")} — if you were` +
+            `\nabout to combine the values above by hand or in a new expression, STOP and` +
+            `\nquery the measure that answers the question directly instead (a bare query,` +
+            `\nno dimensions, is already the grand total).`;
+      } catch { /* advisory only */ }
       return { content: [{ type: "text", text: r.stdout + note }] };
     },
   });

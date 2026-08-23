@@ -44,6 +44,14 @@ xorq_semantic_select  alias=<alias>  measures=["markets_per_100k"]
 xorq_semantic_select  alias=<alias>  dimensions=["state"]  measures=["markets_per_100k"]
 ```
 
+**Grain: no dimensions = the grand total.** A measure queried with NO
+dimensions returns ONE row — the measure evaluated over the model's full
+reviewed scope. A rate or total measure queried bare IS the national/overall
+answer, already at the question's grain. Do not add dimensions and aggregate,
+do not `compose` a total, do not fetch components and combine them — if you
+catch yourself planning "query the pieces, then sum/divide," stop and re-read
+the measure list: the measure that answers directly is almost certainly there.
+
 (The equivalent `xorq_select` compose, when you need it:
 `source.ls.builder.query(measures=['markets_per_100k']).to_tagged()` — names
 as strings, `.to_tagged()` last, nothing chained after.)
